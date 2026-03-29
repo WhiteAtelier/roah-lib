@@ -621,13 +621,23 @@ function(export_config)
     # -- build directory にある install_manifest.txt を読み込んで, そこに書いてあるファイルを削除するスクリプトを生成する.
     # -- generate_uninstall_sh.cmake を script モードで実行
     if (UNIX)
+        # CONFIG TYPES で for 回す
+        foreach(config IN LISTS CMAKE_CONFIGURATION_TYPES)
+            set(ROAH_UNINSTALL_SH_BUILD_PATH "${CMAKE_BINARY_DIR}/uninstall_${config}.sh")
+            configure_file(
+                "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/generate_uninstall_sh.cmake.in"
+                "${CMAKE_BINARY_DIR}/generate_uninstall_sh_${config}.cmake"
+                @ONLY
+            )
+        endforeach()
+        
         install(
             SCRIPT
-                "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/generate_uninstall_sh.cmake"
+                "${CMAKE_BINARY_DIR}/generate_uninstall_sh_$<CONFIG>.cmake"
         )
         install(
             FILES
-                ${CMAKE_BINARY_DIR}/uninstall.sh
+                "${CMAKE_BINARY_DIR}/uninstall_$<CONFIG>.sh"
             DESTINATION
                 "lib/cmake/${CMAKE_PROJECT_NAME}"
         )
