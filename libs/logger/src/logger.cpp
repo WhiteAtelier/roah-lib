@@ -1,0 +1,461 @@
+// Copyright (C) 2026 White Atelier
+// This software is released under the MIT License.
+// See the LICENSE file in the project root for more details.
+
+#include "roah/logger.hpp"
+
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
+
+#include <array>
+#include <filesystem>
+#include <memory>
+#include <mutex>
+#include <ranges>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+namespace roah {
+
+class Logger::Impl_ final
+{
+public:
+    Impl_(std::string && name);
+    ~Impl_() noexcept;
+
+    operator bool() const noexcept;
+
+    void
+    setupLogger();
+
+    void
+    setupLogger(const std::vector<std::shared_ptr<spdlog::sinks::sink>> & sinks);
+
+    void
+    resetLogger();
+
+    void
+    setLevel(const LogLevel log_level);
+
+    void
+    log(const LogLevel               level,
+        const std::source_location & source_location,
+        const std::string_view       fmt,
+        const std::format_args &     args);
+
+    void
+    flush();
+
+    static void
+    initialize(const LogLevel log_level, const std::filesystem::path & log_file);
+
+    static std::shared_ptr<Impl_>
+    getOrCreateImpl(const std::string_view name);
+
+    static void
+    setAllLogLevel(const LogLevel log_level);
+
+private:
+    const std::string               name_;
+    LogLevel                        level_;
+    std::shared_ptr<spdlog::logger> logger_;
+
+    static std::mutex &
+    _getMutex();
+
+    static std::unordered_map<std::string, std::shared_ptr<Impl_>> &
+    _getLoggers();
+
+    static std::vector<std::weak_ptr<spdlog::sinks::sink>> &
+    _getSinks();
+};
+
+}  // namespace roah
+
+namespace {
+
+static roah::LogLevel initial_level_;
+
+struct Converter_
+{
+    spdlog::source_loc
+    operator()(const std::source_location & source_location) const
+    {
+        return spdlog::source_loc{ source_location.file_name(),
+                                   static_cast<int>(source_location.line()),
+                                   source_location.function_name() };
+    }
+
+    spdlog::level::level_enum
+    operator()(const roah::LogLevel lvl) const
+    {
+        switch (lvl)
+        {
+            using enum roah::LogLevel;
+        case Trace: return spdlog::level::trace;
+        case Debug: return spdlog::level::debug;
+        case Info: return spdlog::level::info;
+        case Warn: return spdlog::level::warn;
+        case Error: return spdlog::level::err;
+        case Critical: return spdlog::level::critical;
+        default: return spdlog::level::off;
+        }
+    }
+};
+
+static const Converter_ _converter;
+
+}  // namespace
+
+std::mutex &
+roah::Logger::Impl_::_getMutex()
+{
+    static std::mutex mutex;
+    return mutex;
+}
+
+std::unordered_map<std::string, std::shared_ptr<roah::Logger::Impl_>> &
+roah::Logger::Impl_::_getLoggers()
+{
+    static std::unordered_map<std::string, std::shared_ptr<Impl_>> loggers;
+    return loggers;
+}
+
+std::vector<std::weak_ptr<spdlog::sinks::sink>> &
+roah::Logger::Impl_::_getSinks()
+{
+    static std::vector<std::weak_ptr<spdlog::sinks::sink>> sinks;
+    return sinks;
+}
+
+// ============================================================================================= //
+// Constructor / Destructor
+// ============================================================================================= //
+roah::Logger::Impl_::Impl_(std::string && name)
+    : name_{ std::move(name) }
+    , level_{ initial_level_ }
+    , logger_{}
+{
+    this->setupLogger();
+}
+
+roah::Logger::Impl_::~Impl_() noexcept = default;
+
+roah::Logger::Logger(const std::string_view name)
+    : impl_{ Impl_::getOrCreateImpl(name) }
+{}
+
+roah::Logger::Logger(Logger &&) noexcept = default;
+
+roah::Logger::~Logger() noexcept = default;
+
+roah::Logger &
+roah::Logger::operator=(Logger &&) noexcept
+    = default;
+
+// ============================================================================================= //
+// operator bool / operator!
+// ============================================================================================= //
+roah::Logger::Impl_::operator bool() const noexcept
+{
+    return static_cast<bool>(this->logger_);
+}
+
+roah::Logger::operator bool() const noexcept
+{
+    return static_cast<bool>(*this->impl_);
+}
+
+bool
+roah::Logger::operator!() const noexcept
+{
+    return !static_cast<bool>(*this->impl_);
+}
+
+// ============================================================================================= //
+// [IMPL] setupLogger()
+// ============================================================================================= //
+void
+roah::Logger::Impl_::setupLogger()
+{
+    if (!this->logger_)
+    {
+        // static に保存されている sink の weak_ptr を, すべて lock して logger を作る.
+        const auto & sink_wptrs = Impl_::_getSinks();
+
+        std::vector<std::shared_ptr<spdlog::sinks::sink>> sinks;
+        sinks.reserve(sink_wptrs.size());
+        for (const auto & sink_wptr : sink_wptrs)
+        {
+            if (auto sink = sink_wptr.lock(); sink)
+            {
+                sinks.emplace_back(std::move(sink));
+            }
+        }
+        this->setupLogger(sinks);
+    }
+}
+
+void
+roah::Logger::Impl_::setupLogger(const std::vector<std::shared_ptr<spdlog::sinks::sink>> & sinks)
+{
+    if (!this->logger_)
+    {
+        // spdlog 側で同名の Logger がすでに作成されている場合はそれを利用する.
+        this->logger_ = spdlog::get(this->name_);
+
+        if (!this->logger_ && !sinks.empty())
+        {
+            this->logger_ = std::make_shared<spdlog::logger>(this->name_, sinks.begin(), sinks.end());
+            this->logger_->set_level(spdlog::level::trace);
+            this->level_ = initial_level_;
+            spdlog::register_logger(this->logger_);
+        }
+    }
+}
+
+// ============================================================================================= //
+// [IMPL] resetLogger()
+// ============================================================================================= //
+void
+roah::Logger::Impl_::resetLogger()
+{
+    this->logger_.reset();
+}
+
+// ============================================================================================= //
+// [PRIVATE] _log()
+// ============================================================================================= //
+void
+roah::Logger::Impl_::log(const LogLevel               level,
+                         const std::source_location & source_location,
+                         const std::string_view       fmt,
+                         const std::format_args &     args)
+{
+    // ログレベルフィルタ
+    if (this->level_ > level)
+    {
+        return;
+    }
+
+#ifdef APINE_DEBUG
+    if (!this->logger_) [[unlikely]]
+    {
+        throw std::runtime_error{ "spdlog::logger is not initialized." };
+    }
+#endif
+
+    // ログ出力 (spdlog)
+    this->logger_->log(_converter(source_location), _converter(level), std::vformat(fmt, args));
+}
+
+void
+roah::Logger::_log(const LogLevel               level,
+                   const std::source_location & source_location,
+                   const std::string_view       fmt,
+                   const std::format_args &     args) const
+{
+#ifdef APINE_DEBUG
+    if (!this->impl_) [[unlikely]]
+    {
+        throw std::runtime_error{ "spdlog::logger is not initialized." };
+    }
+#endif
+
+    this->impl_->log(level, source_location, fmt, args);
+}
+
+// ============================================================================================= //
+// setLevel()
+// ============================================================================================= //
+void
+roah::Logger::Impl_::setLevel(const LogLevel log_level)
+{
+    this->level_ = log_level;
+}
+
+void
+roah::Logger::setLevel(const LogLevel log_level)
+{
+#ifdef APINE_DEBUG
+    if (!this->impl_) [[unlikely]]
+    {
+        throw std::runtime_error{ "spdlog::logger is not initialized." };
+    }
+#endif
+    this->impl_->setLevel(log_level);
+}
+
+// ============================================================================================= //
+// flush()
+// ============================================================================================= //
+void
+roah::Logger::Impl_::flush()
+{
+    this->logger_->flush();
+}
+
+void
+roah::Logger::flush() const
+{
+#ifdef APINE_DEBUG
+    if (!this->impl_) [[unlikely]]
+    {
+        throw std::runtime_error{ "spdlog::logger is not initialized." };
+    }
+#endif
+    this->impl_->flush();
+}
+
+// ============================================================================================= //
+// [STATIC] getOrCreateImpl()
+// ============================================================================================= //
+std::shared_ptr<roah::Logger::Impl_>
+roah::Logger::Impl_::getOrCreateImpl(const std::string_view name)
+{
+    std::string     name_str{ name };
+    std::lock_guard lock{ Impl_::_getMutex() };
+    auto &          ptr = Impl_::_getLoggers().try_emplace(name_str).first->second;
+    if (!ptr)
+    {
+        ptr = std::make_shared<Impl_>(std::move(name_str));
+    }
+    return ptr;
+}
+
+// ============================================================================================= //
+// [STATIC] initializeLogger()
+// ============================================================================================= //
+void
+roah::Logger::Impl_::initialize(const LogLevel log_level, const std::filesystem::path & log_file)
+{
+    std::vector<spdlog::sink_ptr> sinks;
+    sinks.reserve(2);
+
+    // ** sink 作成
+    // Console sink
+    const auto & s_stdout = sinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+    s_stdout->set_level(spdlog::level::trace);
+    s_stdout->set_pattern("%^%8l%$ %H:%M:%S.%f t-%-5t [%n] %v");
+
+    // File sink
+    // -- log file が指定されている場合のみ作成
+    if (!log_file.empty())
+    {
+        const auto & s_file
+            = sinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_file.string(), true));
+        s_file->set_level(spdlog::level::trace);
+        s_file->set_pattern("%Y-%m-%d %H:%M:%S.%f (+%i) [%n] PID=%5P, TID=%5t, %@\n[%l] %v\n");
+    }
+
+    // sinks を weak_ptr で保管
+    auto & sink_wptrs = Impl_::_getSinks();
+    sink_wptrs.clear();
+    sink_wptrs.reserve(sinks.size());
+    for (const auto & sink : sinks)
+    {
+        sink_wptrs.emplace_back(sink);
+    }
+
+    // すでに作成されている logger 群を(遅延)初期化
+    initial_level_ = log_level;
+    std::lock_guard lock{ Impl_::_getMutex() };
+    for (const auto & logger : Impl_::_getLoggers() | std::views::values)
+    {
+        logger->setupLogger(sinks);
+    }
+}
+
+void
+roah::Logger::_initialize(const LogLevel log_level, const std::filesystem::path & log_file)
+{
+    Impl_::initialize(log_level, log_file);
+}
+
+roah::Logger roah::lg_default{ "default" };
+
+void
+roah::initializeLogger(const LogLevel log_level, const std::filesystem::path & log_file)
+{
+    Logger::_initialize(log_level, log_file);
+}
+
+roah::LogLevel
+roah::getLogLevelFromString(const std::string_view level_str)
+{
+    if (level_str == "trace")
+    {
+        return LogLevel::Trace;
+    }
+    else if (level_str == "debug")
+    {
+        return LogLevel::Debug;
+    }
+    else if (level_str == "info")
+    {
+        return LogLevel::Info;
+    }
+    else if (level_str == "warn")
+    {
+        return LogLevel::Warn;
+    }
+    else if (level_str == "error")
+    {
+        return LogLevel::Error;
+    }
+    else if (level_str == "critical")
+    {
+        return LogLevel::Critical;
+    }
+    else if (level_str == "off")
+    {
+        return LogLevel::Off;
+    }
+    else
+    {
+        throw std::invalid_argument{ "Invalid log level string: " + std::string{ level_str } };
+    }
+}
+
+std::string_view
+roah::getLogLevelString(const LogLevel log_level)
+{
+    switch (log_level)
+    {
+        using enum LogLevel;
+    case Trace: return "trace";
+    case Debug: return "debug";
+    case Info: return "info";
+    case Warn: return "warn";
+    case Error: return "error";
+    case Critical: return "critical";
+    case Off: return "off";
+    default: return "unknown";
+    }
+}
+
+void
+roah::Logger::Impl_::setAllLogLevel(const LogLevel log_level)
+{
+    std::lock_guard lock{ Impl_::_getMutex() };
+    for (const auto & logger : Logger::Impl_::_getLoggers() | std::views::values)
+    {
+        logger->setLevel(log_level);
+    }
+}
+
+void
+roah::Logger::setAllLogLevel(const LogLevel log_level)
+{
+    Impl_::setAllLogLevel(log_level);
+}
+
+void
+roah::setAllLogLevel(const LogLevel log_level)
+{
+    Logger::setAllLogLevel(log_level);
+}
