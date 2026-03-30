@@ -15,7 +15,7 @@
 #include <string_view>
 #include <utility>
 
-namespace roah::serv {
+namespace roah {
 
 class Config::AccessorImpl_ final : public Accessor_
 {
@@ -45,54 +45,54 @@ private:
     const ItemType & data_;
 };
 
-}  // namespace roah::serv
+}  // namespace roah
 
-roah::serv::Config::AccessorImpl_::AccessorImpl_(const ItemType & data)
+roah::Config::AccessorImpl_::AccessorImpl_(const ItemType & data)
     : data_{ data }
 {}
 
 const std::string &
-roah::serv::Config::AccessorImpl_::getString(const std::string_view category, const std::string_view key) const
+roah::Config::AccessorImpl_::getString(const std::string_view category, const std::string_view key) const
 {
     return this->_get(category, key).as_string();
 }
 
 std::int64_t
-roah::serv::Config::AccessorImpl_::getInt(const std::string_view category, const std::string_view key) const
+roah::Config::AccessorImpl_::getInt(const std::string_view category, const std::string_view key) const
 {
     return static_cast<std::int64_t>(this->_get(category, key).as_integer());
 }
 
 bool
-roah::serv::Config::AccessorImpl_::getBool(const std::string_view category, const std::string_view key) const
+roah::Config::AccessorImpl_::getBool(const std::string_view category, const std::string_view key) const
 {
     return this->_get(category, key).as_boolean();
 }
 
 double
-roah::serv::Config::AccessorImpl_::getDouble(const std::string_view category, const std::string_view key) const
+roah::Config::AccessorImpl_::getDouble(const std::string_view category, const std::string_view key) const
 {
     return this->_get(category, key).as_floating();
 }
 
-const roah::serv::Config::AccessorImpl_::ItemType &
-roah::serv::Config::AccessorImpl_::_get(const std::string_view category, const std::string_view key) const
+const roah::Config::AccessorImpl_::ItemType &
+roah::Config::AccessorImpl_::_get(const std::string_view category, const std::string_view key) const
 {
     return this->data_.at(std::string{ category }).at(std::string{ key });
 }
 
-roah::serv::Config::Config() noexcept = default;
+roah::Config::Config() noexcept = default;
 
-roah::serv::Config::Config(Config &&) noexcept = default;
+roah::Config::Config(Config &&) noexcept = default;
 
-roah::serv::Config::~Config() noexcept = default;
+roah::Config::~Config() noexcept = default;
 
-roah::serv::Config &
-roah::serv::Config::operator=(Config &&) noexcept
+roah::Config &
+roah::Config::operator=(Config &&) noexcept
     = default;
 
 bool
-roah::serv::Config::load(const std::filesystem::path & path)
+roah::Config::load(const std::filesystem::path & path)
 {
     try
     {

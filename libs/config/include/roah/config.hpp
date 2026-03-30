@@ -11,7 +11,7 @@
 #include <string>
 #include <string_view>
 
-namespace roah::serv {
+namespace roah {
 
 class Config
 {
@@ -64,6 +64,6 @@ private:
     class AccessorImpl_;
 };
 
-}  // namespace roah::serv
+}  // namespace roah
 
 #endif
