@@ -1,4 +1,15 @@
+# Copyright (C) 2026 White Atelier
+# This software is released under the MIT License.
+# See the LICENSE file in the project root for more details.
 
 @PACKAGE_INIT@
+
+if (@BUILD_ROAH_LOGGER@)
+    find_package(spdlog 1 REQUIRED)
+endif()
+
+if (@BUILD_ROAH_CONFIG@)
+    find_package(toml11 REQUIRED)
+endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/@CMAKE_PROJECT_NAME@Targets.cmake")

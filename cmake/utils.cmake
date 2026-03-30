@@ -1,3 +1,6 @@
+# Copyright (C) 2026 White Atelier
+# This software is released under the MIT License.
+# See the LICENSE file in the project root for more details.
 
 option(BUILD_TESTS "Build test project." OFF)
 

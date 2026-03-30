@@ -32,6 +32,7 @@ function(add_doxygen_target)
     file(MAKE_DIRECTORY ${DOCUMENT_OUTPUT_DIRECTORY})
 
     add_custom_target(doxygen
+        ALL
         DEPENDS ${DOCUMENT_OUTPUT_DIRECTORY}/index.html
     )
 

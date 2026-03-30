@@ -1,0 +1,14 @@
+{
+    "gabime.spdlog": {
+        "version": "1.15.1",
+        "options": {
+            "DisableDefaultLogger": null,
+            "Shared": null,
+            "UseFmt": null
+        }
+    },
+    "ToruNiina.toml11": {
+        "version": "4.4.0",
+        "options": {}
+    }
+}

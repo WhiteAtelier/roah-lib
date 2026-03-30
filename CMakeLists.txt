@@ -51,3 +51,12 @@ add_subdirectory(libs)
 
 add_doxygen_target()
 export_config()
+
+install(
+    FILES
+        "${CMAKE_SOURCE_DIR}/LICENSE"
+    DESTINATION
+        "lib/cmake/${CMAKE_PROJECT_NAME}"
+    RENAME
+        "libroah-LICENSE"
+)

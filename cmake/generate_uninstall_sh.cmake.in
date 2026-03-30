@@ -1,3 +1,6 @@
+# Copyright (C) 2026 White Atelier
+# This software is released under the MIT License.
+# See the LICENSE file in the project root for more details.
 
 file(WRITE @ROAH_UNINSTALL_SH_BUILD_PATH@ "#!/bin/sh\n")
 
