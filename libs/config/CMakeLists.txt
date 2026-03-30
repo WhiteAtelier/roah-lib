@@ -9,8 +9,8 @@ roah_add_library(roah-config
         toml11::toml11
 
     SOURCES
-        config.cpp
+        config_loader.cpp
 
     HEADERS
-        roah/config.hpp
+        roah/config_loader.hpp
 )
