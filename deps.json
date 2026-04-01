@@ -10,5 +10,13 @@
     "ToruNiina.toml11": {
         "version": "4.4.0",
         "options": {}
+    },
+    "google.googletest": {
+        "version": "1.16.0",
+        "options": {
+            "BuildGmock": null,
+            "CXXStandard": null,
+            "Shared": null
+        }
     }
 }

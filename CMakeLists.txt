@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 
 project(libroah
     VERSION
-        1.0.0
+        1.3.0
     DESCRIPTION
         "Roah Common Libraries"
     LANGUAGES
@@ -37,6 +37,7 @@ add_compile_definitions(
 option(BUILD_ROAH_ASSERT "Build libroah::roah-assert" ON)
 option(BUILD_ROAH_LOGGER "Build libroah::roah-logger" ON)
 option(BUILD_ROAH_CONFIG "Build libroah::roah-config" ON)
+option(BUILD_ROAH_URL_PARSER "Build libroah::roah-url-parser" ON)
 
 # --- Dependencies ---
 if (BUILD_ROAH_LOGGER)
@@ -45,6 +46,10 @@ endif()
 
 if (BUILD_ROAH_CONFIG)
     find_package(toml11 REQUIRED)
+endif()
+
+if (BUILD_ROAH_URL_PARSER)
+    # No dependencies for now
 endif()
 
 add_subdirectory(libs)
