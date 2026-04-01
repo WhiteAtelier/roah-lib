@@ -13,4 +13,7 @@ roah_add_library(roah-config
 
     HEADERS
         roah/config_loader.hpp
+
+    MSVC_HEADERS_FILTER_ROOT
+        roah
 )

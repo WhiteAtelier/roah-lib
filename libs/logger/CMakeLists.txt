@@ -10,4 +10,7 @@ roah_add_library(roah-logger
 
     HEADERS
         roah/logger.hpp
+
+    MSVC_HEADERS_FILTER_ROOT
+        roah
 )

@@ -8,4 +8,7 @@ roah_add_library(roah-assert
 
     HEADERS
         roah/assert.hpp
+
+    MSVC_HEADERS_FILTER_ROOT
+        roah
 )
