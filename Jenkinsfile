@@ -18,7 +18,7 @@ pipeline {
                     ])
                 }
                 sh """
-                    cmake -B "${WORKSPACE}/deps/spdlog/.build" -S "${WORKSPACE}/deps/spdlog/.src" \
+                    cmake -G Ninja -B "${WORKSPACE}/deps/spdlog/.build" -S "${WORKSPACE}/deps/spdlog/.src" \
                         -DCMAKE_INSTALL_PREFIX="${WORKSPACE}/deps/spdlog" \
                         -DSPDLOG_BUILD_EXAMPLE=OFF \
                         -DSPDLOG_BUILD_EXAMPLE_HO=OFF \
@@ -33,8 +33,8 @@ pipeline {
                         -DSPDLOG_USE_STD_FORMAT=ON \
                         -DSPDLOG_FMT_EXTERNAL=OFF
                 """
-                sh "cmake --build '${WORKSPACE}/deps/spdlog/.build' --config Release"
-                sh "cmake --install '${WORKSPACE}/deps/spdlog/.build' --config Release"
+                sh "cmake --build '${WORKSPACE}/deps/spdlog/.build'"
+                sh "cmake --install '${WORKSPACE}/deps/spdlog/.build'"
             }
             post {
                 always {
@@ -53,12 +53,12 @@ pipeline {
                     ])
                 }
                 sh """
-                    cmake -B "${WORKSPACE}/deps/toml11/.build" -S "${WORKSPACE}/deps/toml11/.src" \
+                    cmake -G Ninja -B "${WORKSPACE}/deps/toml11/.build" -S "${WORKSPACE}/deps/toml11/.src" \
                         -DCMAKE_INSTALL_PREFIX="${WORKSPACE}/deps/toml11" \
                         -Dtoml11_BUILD_TESTS=OFF
                 """
-                sh "cmake --build '${WORKSPACE}/deps/toml11/.build' --config Release"
-                sh "cmake --install '${WORKSPACE}/deps/toml11/.build' --config Release"
+                sh "cmake --build '${WORKSPACE}/deps/toml11/.build'"
+                sh "cmake --install '${WORKSPACE}/deps/toml11/.build'"
             }
             post {
                 always {
@@ -77,7 +77,7 @@ pipeline {
                     ])
                 }
                 sh """
-                    cmake -B "${WORKSPACE}/deps/googletest/.build" -S "${WORKSPACE}/deps/googletest/.src" \
+                    cmake -G Ninja -B "${WORKSPACE}/deps/googletest/.build" -S "${WORKSPACE}/deps/googletest/.src" \
                         -DCMAKE_INSTALL_PREFIX="${WORKSPACE}/deps/googletest" \
                         -DINSTALL_GTEST=1 \
                         -Dgtest_force_shared_crt=1 \
@@ -85,13 +85,59 @@ pipeline {
                         -DBUILD_SHARED_LIBS=OFF \
                         -DBUILD_GMOCK=OFF
                 """
-                sh "cmake --build '${WORKSPACE}/deps/googletest/.build' --config Release"
-                sh "cmake --install '${WORKSPACE}/deps/googletest/.build' --config Release"
+                sh "cmake --build '${WORKSPACE}/deps/googletest/.build'"
+                sh "cmake --install '${WORKSPACE}/deps/googletest/.build'"
             }
             post {
                 always {
                     sh "rm -rf '${WORKSPACE}/deps/googletest/.src' '${WORKSPACE}/deps/googletest/.build'"
                 }
+            }
+        }
+
+        stage('Configure roah-lib') {
+            steps {
+                sh """
+                    cmake -G Ninja -B "${WORKSPACE}/build" -S "${WORKSPACE}" \
+                        -DCMAKE_BUILD_TYPE=Release \
+                        -DCMAKE_INSTALL_PREFIX="${WORKSPACE}/install" \
+                        -DCMAKE_PREFIX_PATH="${WORKSPACE}/deps/spdlog;${WORKSPACE}/deps/toml11;${WORKSPACE}/deps/googletest" \
+                        -DBUILD_DOCS=1 \
+                        -DBUILD_TESTS=1 \
+                        -DBUILD_ROAH_ASSERT=1 \
+                        -DBUILD_ROAH_LOGGER=1 \
+                        -DBUILD_ROAH_CONFIG=1 \
+                        -DBUILD_ROAH_URL_PARSER=1
+                """
+            }
+        }
+
+        stage('Build roah-lib') {
+            steps {
+                sh "cmake --build '${WORKSPACE}/build'"
+            }
+        }
+
+        stage('Install roah-lib') {
+            steps {
+                sh "cmake --install '${WORKSPACE}/build'"
+            }
+        }
+
+        stage('Run tests') {
+            steps {
+                sh "ctest --test-dir '${WORKSPACE}/build' --output-on-failure --output-junit '${WORKSPACE}/test-results.xml'"
+            }
+            post {
+                always {
+                    junit 'test-results.xml'
+                }
+            }
+        }
+
+        stage('Save artifacts') {
+            steps {
+                archiveArtifacts artifacts: 'install/**', followSymlinks: false
             }
         }
     }
