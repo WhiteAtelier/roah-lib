@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Build spdlog') {
             steps {
-                dir('${WORKSPACE}/deps/spdlog/.src') {
+                dir('deps/spdlog/.src') {
                     checkout([
                         $class: 'GitSCM',
                         branches: [[name: "${SPDLOG_COMMIT}"]],
@@ -45,7 +45,7 @@ pipeline {
 
         stage('Build toml11') {
             steps {
-                dir('${WORKSPACE}/deps/toml11/.src') {
+                dir('deps/toml11/.src') {
                     checkout([
                         $class: 'GitSCM',
                         branches: [[name: "${TOML11_COMMIT}"]],
@@ -69,7 +69,7 @@ pipeline {
 
         stage('Build googletest') {
             steps {
-                dir('${WORKSPACE}/deps/googletest/.src') {
+                dir('deps/googletest/.src') {
                     checkout([
                         $class: 'GitSCM',
                         branches: [[name: "${GOOGLETEST_COMMIT}"]],
