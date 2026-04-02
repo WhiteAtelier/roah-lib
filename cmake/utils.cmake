@@ -5,7 +5,7 @@
 option(BUILD_TESTS "Build test project." OFF)
 
 # =============================================================================================== #
-# 
+#
 # roah_add_library
 #
 # - LIBRARIES (multi)
@@ -174,7 +174,7 @@ function(roah_add_library ARG_TARGET_NAME)
             foreach (rel_source_file IN LISTS ARG_SOURCES)
                 # 絶対パス
                 file(REAL_PATH "src/${rel_source_file}" abs_source_file)
-                
+
                 # フィルタ文字列
                 string(REPLACE "/" "\\" rel_source_file "${rel_source_file}")
                 string(REPLACE "${source_filter_root}\\" "" rel_source_file "${rel_source_file}")
@@ -195,7 +195,7 @@ function(roah_add_library ARG_TARGET_NAME)
             foreach (rel_header_file IN LISTS ARG_HEADERS)
                 # 絶対パス
                 file(REAL_PATH "include/${rel_header_file}" abs_header_file)
-                
+
                 # フィルタ文字列
                 string(REPLACE "/" "\\" rel_header_file "${rel_header_file}")
                 string(REPLACE "${headers_filter_root}\\" "" rel_header_file "${rel_header_file}")
@@ -229,8 +229,8 @@ function(roah_add_library ARG_TARGET_NAME)
                     message(DEBUG "TEST: ${abs_test_file}")
                 endif()
             endforeach()
-        endif()  
-        
+        endif()
+
         find_package(GTest REQUIRED)
         include(GoogleTest)
 
@@ -260,7 +260,7 @@ function(roah_add_library ARG_TARGET_NAME)
                 foreach (rel_test_file IN LISTS ARG_TESTS)
                     # 絶対パス
                     file(REAL_PATH "test/${rel_test_file}" abs_test_file)
-                    
+
                     # フィルタ文字列
                     string(REPLACE "/" "\\" rel_test_file "${rel_test_file}")
                     cmake_path(GET rel_test_file PARENT_PATH rel_test_file)
@@ -321,7 +321,7 @@ endfunction()
 
 
 # =============================================================================================== #
-# 
+#
 # roah_add_executable
 #
 # - LIBRARIES (multi)
@@ -368,7 +368,7 @@ function(roah_add_executable ARG_TARGET_NAME)
     if (DEFINED ARG_TARGET_FOLDER)
         set(TARGET_FOLDER "${ARG_TARGET_FOLDER}/executables")
     endif()
-    
+
     set(TEST_TARGET_FOLDER "tests")
     if (DEFINED ARG_TARGET_FOLDER)
         set(TEST_TARGET_FOLDER "${ARG_TARGET_FOLDER}/tests")
@@ -452,7 +452,7 @@ function(roah_add_executable ARG_TARGET_NAME)
             foreach (rel_source_file IN LISTS ARG_SOURCES)
                 # 絶対パス
                 file(REAL_PATH "src/${rel_source_file}" abs_source_file)
-                
+
                 # フィルタ文字列
                 string(REPLACE "/" "\\" rel_source_file "${rel_source_file}")
                 string(REPLACE "${sources_filter_root}\\" "" rel_source_file "${rel_source_file}")
@@ -495,8 +495,8 @@ function(roah_add_executable ARG_TARGET_NAME)
                     message(STATUS "TEST: ${abs_test_file}")
                 endif()
             endforeach()
-        endif()  
-        
+        endif()
+
         find_package(GTest REQUIRED)
         include(GoogleTest)
 
@@ -517,7 +517,7 @@ function(roah_add_executable ARG_TARGET_NAME)
                     ${ARG_ABS_TESTS}
             )
         endif()
-    
+
         # --- filters
         if (MSVC)
             # ARG_TESTS を見て, test/ を付加する
@@ -525,7 +525,7 @@ function(roah_add_executable ARG_TARGET_NAME)
                 foreach (rel_test_file IN LISTS ARG_TESTS)
                     # 絶対パス
                     file(REAL_PATH "test/${rel_test_file}" abs_test_file)
-                    
+
                     # フィルタ文字列
                     string(REPLACE "/" "\\" rel_test_file "${rel_test_file}")
                     cmake_path(GET rel_test_file PARENT_PATH rel_test_file)
@@ -619,31 +619,5 @@ function(export_config)
         DESTINATION
             "lib/cmake/${CMAKE_PROJECT_NAME}"
     )
-
-    # uninstall.sh 作成
-    # -- build directory にある install_manifest.txt を読み込んで, そこに書いてあるファイルを削除するスクリプトを生成する.
-    # -- generate_uninstall_sh.cmake を script モードで実行
-    if (UNIX)
-        # CONFIG TYPES で for 回す
-        foreach(config IN LISTS CMAKE_CONFIGURATION_TYPES)
-            set(ROAH_UNINSTALL_SH_BUILD_PATH "${CMAKE_BINARY_DIR}/uninstall_${config}.sh")
-            configure_file(
-                "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/generate_uninstall_sh.cmake.in"
-                "${CMAKE_BINARY_DIR}/generate_uninstall_sh_${config}.cmake"
-                @ONLY
-            )
-        endforeach()
-        
-        install(
-            SCRIPT
-                "${CMAKE_BINARY_DIR}/generate_uninstall_sh_$<CONFIG>.cmake"
-        )
-        install(
-            FILES
-                "${CMAKE_BINARY_DIR}/uninstall_$<CONFIG>.sh"
-            DESTINATION
-                "lib/cmake/${CMAKE_PROJECT_NAME}"
-        )
-    endif()
 
 endfunction()
