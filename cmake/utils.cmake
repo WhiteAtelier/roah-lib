@@ -4,6 +4,12 @@
 
 option(BUILD_TESTS "Build test project." OFF)
 
+if (BUILD_TESTS)
+    enable_testing()
+    find_package(GTest REQUIRED)
+    include(GoogleTest)
+endif()
+
 # =============================================================================================== #
 #
 # roah_add_library
@@ -230,9 +236,6 @@ function(roah_add_library ARG_TARGET_NAME)
                 endif()
             endforeach()
         endif()
-
-        find_package(GTest REQUIRED)
-        include(GoogleTest)
 
         # --- Add executable ---
         add_executable(${ARG_TARGET_NAME}-test)
@@ -496,9 +499,6 @@ function(roah_add_executable ARG_TARGET_NAME)
                 endif()
             endforeach()
         endif()
-
-        find_package(GTest REQUIRED)
-        include(GoogleTest)
 
         add_executable(${ARG_TARGET_NAME}-test)
         set_target_properties(${ARG_TARGET_NAME}-test
