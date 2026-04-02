@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        SPDLOG_COMMIT       = '79524ddd08a4ec981b7fea76afd08ee05f83755d'  # tag 1.7.0
-        TOML11_COMMIT       = 'be08ba2be2a964edcdb3d3e3ea8d100abc26f286'  # tag v4.4.0
-        GOOGLETEST_COMMIT   = '52eb8108c5bdec04579160ae17225d66034bd723'  # tag v1.17.0
+        SPDLOG_COMMIT       = '79524ddd08a4ec981b7fea76afd08ee05f83755d'  // tag 1.7.0
+        TOML11_COMMIT       = 'be08ba2be2a964edcdb3d3e3ea8d100abc26f286'  // tag v4.4.0
+        GOOGLETEST_COMMIT   = '52eb8108c5bdec04579160ae17225d66034bd723'  // tag v1.17.0
     }
 
     stages {
