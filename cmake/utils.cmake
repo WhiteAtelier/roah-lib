@@ -313,6 +313,10 @@ function(roah_add_library ARG_TARGET_NAME)
                     "${CMAKE_CURRENT_LIST_DIR}/test/resource"
                 DESTINATION
                     "${CMAKE_CURRENT_BINARY_DIR}")
+            target_compile_definitions(${ARG_TARGET_NAME}-test
+                PRIVATE
+                    ROAH_TEST_RESOURCE_DIR="${CMAKE_CURRENT_BINARY_DIR}/resource"
+            )
         endif()
 
         gtest_discover_tests(
