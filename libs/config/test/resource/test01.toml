@@ -1,0 +1,11 @@
+[server]
+host = "localhost"
+port = 8080
+enabled = true
+rate = 3.14
+
+[database]
+name = "mydb"
+max_connections = 100
+debug = false
+timeout = 2.5
