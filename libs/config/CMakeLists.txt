@@ -9,10 +9,15 @@ roah_add_library(roah-config
         toml11::toml11
 
     SOURCES
+        config_error.cpp
         config_loader.cpp
 
     HEADERS
         roah/config_loader.hpp
+        roah/config_error.hpp
+
+    TESTS
+        main.cpp
 
     MSVC_HEADERS_FILTER_ROOT
         roah
