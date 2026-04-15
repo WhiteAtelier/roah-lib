@@ -374,7 +374,7 @@ roah::Logger::Impl_::initialize(const std::string_view application_name, const L
         {
 #if defined(ROAH_ARCH_WIN32)
             dir_path = std::filesystem::temp_directory_path();
-#elif defined(ROAH_ARCH_UNIX)
+#elif defined(ROAH_ARCH_LINUX)
             dir_path = "/var/log";
 #else
 #    error "Unsupported platform"

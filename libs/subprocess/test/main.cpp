@@ -6,7 +6,7 @@
 // プラットフォーム API との比較に使用.
 #if defined(ROAH_ARCH_WIN32)
 #    include <Windows.h>
-#elif defined(ROAH_ARCH_UNIX)
+#elif defined(ROAH_ARCH_LINUX)
 #    include <unistd.h>
 #else
 #    error "Unsupported platform"
@@ -19,7 +19,7 @@
 namespace {
 #if defined(ROAH_ARCH_WIN32)
 using NativePIDType = DWORD;
-#elif defined(ROAH_ARCH_UNIX)
+#elif defined(ROAH_ARCH_LINUX)
 using NativePIDType = pid_t;
 #endif
 }  // namespace
@@ -174,7 +174,7 @@ TEST(GetCurrentProcessIDTest, MatchesPlatformAPI)
 {
 #if defined(ROAH_ARCH_WIN32)
     const NativePIDType expected = ::GetCurrentProcessId();
-#elif defined(ROAH_ARCH_UNIX)
+#elif defined(ROAH_ARCH_LINUX)
     const NativePIDType expected = ::getpid();
 #endif
     const roah::ProcessID pid = roah::getCurrentProcessID();
@@ -185,7 +185,7 @@ TEST(GetCurrentProcessIDTest, ToStringMatchesPlatformAPI)
 {
 #if defined(ROAH_ARCH_WIN32)
     const std::string expected = std::to_string(::GetCurrentProcessId());
-#elif defined(ROAH_ARCH_UNIX)
+#elif defined(ROAH_ARCH_LINUX)
     const std::string expected = std::to_string(::getpid());
 #endif
     const roah::ProcessID pid = roah::getCurrentProcessID();

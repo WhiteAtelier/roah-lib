@@ -6,7 +6,7 @@
 
 #if defined(ROAH_ARCH_WIN32)
 #    include <Windows.h>
-#elif defined(ROAH_ARCH_UNIX)
+#elif defined(ROAH_ARCH_LINUX)
 #    include <unistd.h>
 #else
 #    error "Unsupported platform"
@@ -19,7 +19,7 @@
 namespace {
 #if defined(ROAH_ARCH_WIN32)
 using NativePIDType = DWORD;
-#elif defined(ROAH_ARCH_UNIX)
+#elif defined(ROAH_ARCH_LINUX)
 using NativePIDType = pid_t;
 #endif
 }  // namespace
@@ -103,7 +103,7 @@ roah::getCurrentProcessID()
 {
 #if defined(ROAH_ARCH_WIN32)
     return ProcessID{ GetCurrentProcessId() };
-#elif defined(ROAH_ARCH_UNIX)
+#elif defined(ROAH_ARCH_LINUX)
     return ProcessID{ getpid() };
 #else
 #    error "Unsupported platform"
