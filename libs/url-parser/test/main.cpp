@@ -1,6 +1,5 @@
-// Copyright (C) 2026 White Atelier
-// This software is released under the MIT License.
-// See the LICENSE file in the project root for more details.
+// This file contains code generated with the assistance of Claude (Anthropic),
+// an AI assistant. The generated code is provided as-is.
 
 #include "roah/url_parse_error.hpp"
 #include "roah/url_parser.hpp"

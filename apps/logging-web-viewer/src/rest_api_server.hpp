@@ -1,3 +1,7 @@
+// Copyright (C) 2026 White Atelier
+// This software is released under the MIT License.
+// See the LICENSE file in the project root for more details.
+
 #ifndef ROAH_LOGGING_WEB_VIEWER_REST_API_SERVER_HPP
 #define ROAH_LOGGING_WEB_VIEWER_REST_API_SERVER_HPP
 

@@ -1,3 +1,6 @@
+# Copyright (C) 2026 White Atelier
+# This software is released under the MIT License.
+# See the LICENSE file in the project root for more details.
 
 # --- frontend, npm build target ---
 find_program(NPM_EXECUTABLE npm REQUIRED)

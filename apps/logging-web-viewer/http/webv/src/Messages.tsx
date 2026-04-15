@@ -1,3 +1,7 @@
+// Copyright (C) 2026 White Atelier
+// This software is released under the MIT License.
+// See the LICENSE file in the project root for more details.
+
 import { Component, createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
 import { FilterSet, LogEntry } from "./data";
 import style from "./Messages.module.scss";

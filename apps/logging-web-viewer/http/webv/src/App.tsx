@@ -1,3 +1,7 @@
+// Copyright (C) 2026 White Atelier
+// This software is released under the MIT License.
+// See the LICENSE file in the project root for more details.
+
 import { createMemo, createResource, createSignal, Component } from "solid-js";
 import { createStore } from "solid-js/store";
 import { createReconnectingWS, createWSState, WSMessage } from "@solid-primitives/websocket";
