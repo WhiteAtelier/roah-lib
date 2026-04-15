@@ -1,3 +1,6 @@
+# This file contains code generated with the assistance of Claude (Anthropic),
+# an AI assistant. The generated code is provided as-is.
+
 # embed_files.cmake
 # Reads all files under DIST_DIR recursively and writes .inl files to OUTPUT_DIR.
 # Each .inl file contains the file's bytes as comma-separated hex literals.
