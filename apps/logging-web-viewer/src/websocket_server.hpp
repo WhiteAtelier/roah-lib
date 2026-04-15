@@ -33,8 +33,8 @@ private:
 
     const Config &                            config_;
     ix::WebSocketServer                       server_;
-    bool                                      started_;
     std::vector<std::weak_ptr<ix::WebSocket>> subscribers_;
+    bool                                      started_;
 };
 
 }  // namespace roah::logging::webv

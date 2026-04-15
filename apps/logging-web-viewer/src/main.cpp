@@ -38,10 +38,11 @@ main(const int argc, const char * const argv[])
 
         roah::initializeLogger("roah-logging-web-viewer",
                                roah::LoggerInitializeArgs{
-                                   .console = { .level = roah::LogLevel::Debug },
-                                   .webv    = { .level       = roah::LogLevel::Debug,
-                                                .server_host = config.getServerHost(),
-                                                .server_port = config.getWebsocketServerPort() },
+                                   .console  = { .level = roah::LogLevel::Debug },
+                                   .log_file = {},
+                                   .webv     = { .level       = roah::LogLevel::Debug,
+                                                 .server_host = config.getServerHost(),
+                                                 .server_port = config.getWebsocketServerPort() },
                                });
 
         if (!ix::initNetSystem())

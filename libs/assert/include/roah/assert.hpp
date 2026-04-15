@@ -135,29 +135,30 @@ private:
 #endif
 
 // --- Coding Error Macros ---
+// 波かっこ初期化は, テストの時に不都合であったため丸かっこに変更した
 #define ROAH_CODING_ERROR(expr)                                                       \
     if (!(expr)) [[unlikely]]                                                         \
     {                                                                                 \
         ::roah::AssertionError::printMessage(#expr, std::source_location::current()); \
-        throw ::roah::AssertionError{ #expr, std::source_location::current() };       \
+        throw ::roah::AssertionError(#expr, std::source_location::current());         \
     }
 #define ROAH_CODING_ERROR_C(expr)                                                     \
     if constexpr (!(expr))                                                            \
     {                                                                                 \
         ::roah::AssertionError::printMessage(#expr, std::source_location::current()); \
-        throw ::roah::AssertionError{ #expr, std::source_location::current() };       \
+        throw ::roah::AssertionError(#expr, std::source_location::current());         \
     }
 #define ROAH_CODING_ERROR_M(expr, msg)                                                     \
     if (!(expr)) [[unlikely]]                                                              \
     {                                                                                      \
         ::roah::AssertionError::printMessage(#expr, std::source_location::current(), msg); \
-        throw ::roah::AssertionError{ #expr, std::source_location::current() };            \
+        throw ::roah::AssertionError(#expr, std::source_location::current());              \
     }
 #define ROAH_CODING_ERROR_M_C(expr, msg)                                                   \
     if constexpr (!(expr))                                                                 \
     {                                                                                      \
         ::roah::AssertionError::printMessage(#expr, std::source_location::current(), msg); \
-        throw ::roah::AssertionError{ #expr, std::source_location::current() };            \
+        throw ::roah::AssertionError(#expr, std::source_location::current());              \
     }
 
 #ifdef ROAH_DEBUG
@@ -171,7 +172,7 @@ private:
             return v;                                            \
         }((expr))
 #else
-#    define ROAH_ASSERTION(expr) (expr)
+#    define ROAH_VERIFY(expr) (expr)
 #endif
 
 #endif

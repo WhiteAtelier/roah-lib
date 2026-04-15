@@ -13,8 +13,8 @@ const roah::Logger logger{ "WebsocketServer" };
 
 roah::logging::webv::WebsocketServer::WebsocketServer(const Config & config)
     : config_{ config }
-    , started_{ false }
     , server_{ static_cast<int>(config.getWebsocketServerPort()), config.getServerHost() }
+    , started_{ false }
 {}
 
 roah::logging::webv::WebsocketServer::~WebsocketServer() noexcept
@@ -147,6 +147,10 @@ roah::logging::webv::WebsocketServer::_onClientMessageReceived(std::shared_ptr<i
         {
             ROAH_ERROR(logger, "Failed to parse message: {}", e.what());
         }
+        break;
+
+    default:
+        // IGNORE
         break;
     }
 }
