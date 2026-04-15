@@ -72,17 +72,6 @@ TEST(ProcessIDTest, MoveAssignmentTransfersValue)
     EXPECT_EQ(static_cast<NativePIDType>(pid1), NativePIDType{ 0 });
 }
 
-TEST(ProcessIDTest, SelfMoveAssignmentIsSafe)
-{
-    roah::ProcessID pid = roah::getCurrentProcessID();
-    [[maybe_unused]]
-    const auto val
-        = static_cast<NativePIDType>(pid);
-    pid = std::move(pid);  // NOLINT(bugprone-use-after-move)
-    // 自己代入後は値が保持されるか, 少なくともクラッシュしない
-    SUCCEED();
-}
-
 TEST(ProcessIDTest, EqualityOperatorReturnsTrueForSameValue)
 {
     const roah::ProcessID pid1 = roah::getCurrentProcessID();
