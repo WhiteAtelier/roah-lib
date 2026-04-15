@@ -18,5 +18,24 @@
             "CXXStandard": null,
             "Shared": null
         }
+    },
+    "machinezone.IXWebSocket": {
+        "version": "11.4.6",
+        "options": {
+            "Shared": null,
+            "UseZlib": null
+        }
+    },
+    "nlohmann.json": {
+        "version": "3.11.3",
+        "options": {}
+    },
+    "CLIUtils.CLI11": {
+        "version": "2.5.0",
+        "options": {
+            "Precompiled": null,
+            "Sanitizers": null,
+            "SingleFile": null
+        }
     }
 }

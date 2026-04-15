@@ -129,6 +129,10 @@ function(roah_add_library ARG_TARGET_NAME)
         PRIVATE
             # Debug Mode Flag
             $<$<CONFIG:Debug>:ROAH_DEBUG=1>
+
+            # Architecture Flags
+            $<$<PLATFORM_ID:Windows>:ROAH_ARCH_WIN32>
+            $<$<PLATFORM_ID:Linux>:ROAH_ARCH_LINUX>
     )
     if (DEFINED ARG_COMPILE_DEFINITIONS)
         target_compile_definitions(${ARG_TARGET_NAME}
@@ -297,6 +301,10 @@ function(roah_add_library ARG_TARGET_NAME)
             PRIVATE
                 # Debug Mode Flag
                 $<$<CONFIG:Debug>:ROAH_DEBUG=1>
+
+                # Architecture Flags
+                $<$<PLATFORM_ID:Windows>:ROAH_ARCH_WIN32>
+                $<$<PLATFORM_ID:Linux>:ROAH_ARCH_LINUX>
         )
         if (DEFINED ARG_COMPILE_DEFINITIONS)
             target_compile_definitions(${ARG_TARGET_NAME}-test
@@ -430,6 +438,10 @@ function(roah_add_executable ARG_TARGET_NAME)
         PRIVATE
             # Debug Mode Flag
             $<$<CONFIG:Debug>:ROAH_DEBUG=1>
+
+            # Architecture Flags
+            $<$<PLATFORM_ID:Windows>:ROAH_ARCH_WIN32>
+            $<$<PLATFORM_ID:Linux>:ROAH_ARCH_LINUX>
     )
     if (DEFINED ARG_COMPILE_DEFINITIONS)
         target_compile_definitions(${ARG_TARGET_NAME}
@@ -563,6 +575,10 @@ function(roah_add_executable ARG_TARGET_NAME)
             PUBLIC
                 # Debug Mode Flag
                 $<$<CONFIG:Debug>:ROAH_DEBUG=1>
+
+                # Architecture Flags
+                $<$<PLATFORM_ID:Windows>:ROAH_ARCH_WIN32>
+                $<$<PLATFORM_ID:Linux>:ROAH_ARCH_LINUX>
         )
         if (DEFINED ARG_COMPILE_DEFINITIONS)
             target_compile_definitions(${ARG_TARGET_NAME}-test

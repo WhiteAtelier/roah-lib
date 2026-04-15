@@ -1,5 +1,5 @@
-#ifndef ROAH_CONFIG_ERROR_HPP
-#define ROAH_CONFIG_ERROR_HPP
+#ifndef ROAH_CONFIG_LOADER_ERROR_HPP
+#define ROAH_CONFIG_LOADER_ERROR_HPP
 
 #include <filesystem>
 #include <stdexcept>
@@ -12,7 +12,7 @@ namespace roah {
 ///
 /// @brief Config 読み込みにおけるすべての例外の基底クラス.
 ///
-class ConfigError : public std::runtime_error
+class ConfigLoaderError : public std::runtime_error
 {
 public:
     /// @brief Constructor.
@@ -21,7 +21,7 @@ public:
     ///
     /// @param message
     ///     例外の詳細なメッセージ.
-    explicit ConfigError(const std::string_view message);
+    explicit ConfigLoaderError(const std::string_view message);
 
     /// @brief 例外クラス名を取得する.
     std::string_view
@@ -36,8 +36,8 @@ protected:
     ///     文字列リテラルの指定を推奨.
     ///
     /// @param message
-    ///     メッセージ. ConfigError クラスのコンストラクタと同様に, クラス名を含む形式でフォーマットされる.
-    explicit ConfigError(const std::string_view error_class, const std::string & message);
+    ///     メッセージ. ConfigLoaderError クラスのコンストラクタと同様に, クラス名を含む形式でフォーマットされる.
+    explicit ConfigLoaderError(const std::string_view error_class, const std::string & message);
 
 private:
     std::string_view error_class_;
@@ -47,7 +47,7 @@ private:
 ///
 /// @brief Config ファイルの読み込み時に発生した例外クラス.
 ///
-class ConfigFileIOError final : public ConfigError
+class ConfigFileIOError final : public ConfigLoaderError
 {
 public:
     /// @brief Constructor.
@@ -64,7 +64,7 @@ public:
 ///
 /// @brief 設定ファイルの構文エラーを表す例外クラス.
 ///
-class ConfigSyntaxError final : public ConfigError
+class ConfigSyntaxError final : public ConfigLoaderError
 {
 public:
     /// @brief Constructor.
@@ -81,7 +81,7 @@ public:
 ///
 /// @brief Config ファイルに必要なキーが見つからないことを表す例外クラス.
 ///
-class ConfigRequiredKeyNotFoundError final : public ConfigError
+class ConfigRequiredKeyNotFoundError final : public ConfigLoaderError
 {
 public:
     /// @brief Constructor.
@@ -98,7 +98,7 @@ public:
 ///
 /// @brief 指定したキーについて, 期待される型と異なる型の値が設定されていることを表す例外クラス.
 ///
-class ConfigTypeError final : public ConfigError
+class ConfigTypeError final : public ConfigLoaderError
 {
 public:
     /// @brief Constructor.

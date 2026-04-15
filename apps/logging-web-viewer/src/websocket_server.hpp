@@ -1,0 +1,42 @@
+#ifndef ROAH_LOGGING_WEB_VIEWER_WEBSOCKET_SERVER_HPP
+#define ROAH_LOGGING_WEB_VIEWER_WEBSOCKET_SERVER_HPP
+
+#include <IXWebSocketServer.h>
+
+#include <memory>
+#include <vector>
+
+namespace roah::logging::webv {
+
+class Config;
+
+class WebsocketServer
+{
+public:
+    WebsocketServer(const Config & config);
+    ~WebsocketServer() noexcept;
+
+    bool
+    start();
+
+    void
+    stop();
+
+private:
+    void
+    _onClientMessageReceived(std::shared_ptr<ix::ConnectionState> && connection_state,
+                             ix::WebSocket &                         ws,
+                             const ix::WebSocketMessagePtr &         msg);
+
+    void
+    _reportClientCount(const std::size_t count);
+
+    const Config &                            config_;
+    ix::WebSocketServer                       server_;
+    bool                                      started_;
+    std::vector<std::weak_ptr<ix::WebSocket>> subscribers_;
+};
+
+}  // namespace roah::logging::webv
+
+#endif

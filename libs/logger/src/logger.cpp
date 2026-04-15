@@ -4,12 +4,19 @@
 
 #include "roah/logger.hpp"
 
+#ifdef ROAH_LOGGER_ENABLE_WEBV_SINK
+#    include "impl/webv_sink.hpp"
+#endif
+
+#include "roah/process_id.hpp"
+
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
 #include <array>
 #include <filesystem>
+#include <format>
 #include <memory>
 #include <mutex>
 #include <ranges>
@@ -51,7 +58,7 @@ public:
     flush();
 
     static void
-    initialize(const LogLevel log_level, const std::filesystem::path & log_file);
+    initialize(const std::string_view application_name, const LoggerInitializeArgs & args);
 
     static std::shared_ptr<Impl_>
     getOrCreateImpl(const std::string_view name);
@@ -331,26 +338,76 @@ roah::Logger::Impl_::getOrCreateImpl(const std::string_view name)
 // [STATIC] initializeLogger()
 // ============================================================================================= //
 void
-roah::Logger::Impl_::initialize(const LogLevel log_level, const std::filesystem::path & log_file)
+roah::Logger::Impl_::initialize(const std::string_view application_name, const LoggerInitializeArgs & args)
 {
-    std::vector<spdlog::sink_ptr> sinks;
-    sinks.reserve(2);
-
-    // ** sink 作成
-    // Console sink
-    const auto & s_stdout = sinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-    s_stdout->set_level(spdlog::level::trace);
-    s_stdout->set_pattern("%^%8l%$ %H:%M:%S.%f t-%-5t [%n] %v");
-
-    // File sink
-    // -- log file が指定されている場合のみ作成
-    if (!log_file.empty())
+    if (application_name.empty())
     {
-        const auto & s_file
-            = sinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_file.string(), true));
-        s_file->set_level(spdlog::level::trace);
-        s_file->set_pattern("%Y-%m-%d %H:%M:%S.%f (+%i) [%n] PID=%5P, TID=%5t, %@\n[%l] %v\n");
+        throw std::invalid_argument{ "Application name must not be empty." };
     }
+
+    std::vector<spdlog::sink_ptr> sinks;
+    sinks.reserve(3);
+
+    initial_level_      = LogLevel::Off;
+    const auto lower_fn = [](const LogLevel level) {
+        if (initial_level_ > level)
+        {
+            initial_level_ = level;
+        }
+    };
+
+    // ** Console sink
+    if (args.console.level != LogLevel::Off)
+    {
+        const auto & s_stdout = sinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+        s_stdout->set_level(_converter(args.console.level));
+        s_stdout->set_pattern("%^%8l%$ %H:%M:%S.%f t-%-5t [%n] %v");
+        lower_fn(args.console.level);
+    }
+
+    // ** File sink
+    if (args.log_file.level != LogLevel::Off)
+    {
+        // dirpath について, 空である場合はデフォルトとする.
+        auto dir_path = args.log_file.dir_path;
+        if (dir_path.empty())
+        {
+#if defined(ROAH_ARCH_WIN32)
+            dir_path = std::filesystem::temp_directory_path();
+#elif defined(ROAH_ARCH_UNIX)
+            dir_path = "/var/log";
+#else
+#    error "Unsupported platform"
+#endif
+        }
+        auto file_name = args.log_file.file_name;
+        if (file_name.empty())
+        {
+            const auto pid = getCurrentProcessID();
+            file_name      = std::format("{}_{}_{}.log",  //
+                                    application_name,
+                                    std::chrono::system_clock::now(),
+                                    pid.toHexString());
+        }
+
+        const auto & s_file = sinks.emplace_back(
+            std::make_shared<spdlog::sinks::basic_file_sink_mt>((dir_path / file_name).string(), true));
+        s_file->set_level(_converter(args.log_file.level));
+        s_file->set_pattern("%Y-%m-%d %H:%M:%S.%f (+%i) [%n] PID=%5P, TID=%5t, %@\n[%l] %v\n");
+        lower_fn(args.log_file.level);
+    }
+
+#ifdef ROAH_LOGGER_ENABLE_WEBV_SINK
+    if (args.webv.level != LogLevel::Off)
+    {
+        const auto & s_webv = sinks.emplace_back(std::make_shared<logger::impl::WebVSinkMt>(  //
+            args.webv.server_host,
+            args.webv.server_port,
+            std::string{ application_name }));
+        s_webv->set_level(_converter(args.webv.level));
+        lower_fn(args.webv.level);
+    }
+#endif
 
     // sinks を weak_ptr で保管
     auto & sink_wptrs = Impl_::_getSinks();
@@ -362,7 +419,6 @@ roah::Logger::Impl_::initialize(const LogLevel log_level, const std::filesystem:
     }
 
     // すでに作成されている logger 群を(遅延)初期化
-    initial_level_ = log_level;
     std::lock_guard lock{ Impl_::_getMutex() };
     for (const auto & logger : Impl_::_getLoggers() | std::views::values)
     {
@@ -371,17 +427,17 @@ roah::Logger::Impl_::initialize(const LogLevel log_level, const std::filesystem:
 }
 
 void
-roah::Logger::_initialize(const LogLevel log_level, const std::filesystem::path & log_file)
+roah::Logger::_initialize(const std::string_view application_name, const LoggerInitializeArgs & args)
 {
-    Impl_::initialize(log_level, log_file);
+    Impl_::initialize(application_name, args);
 }
 
 roah::Logger roah::lg_default{ "default" };
 
 void
-roah::initializeLogger(const LogLevel log_level, const std::filesystem::path & log_file)
+roah::initializeLogger(const std::string_view application_name, const LoggerInitializeArgs & args)
 {
-    Logger::_initialize(log_level, log_file);
+    Logger::_initialize(application_name, args);
 }
 
 roah::LogLevel
