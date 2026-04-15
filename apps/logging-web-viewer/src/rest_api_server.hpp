@@ -24,8 +24,8 @@ private:
     _onRequest(ix::HttpRequestPtr && request, std::shared_ptr<ix::ConnectionState> && connectionState);
 
     const Config & config_;
-    bool           started_;
     ix::HttpServer server_;
+    bool           started_;
 };
 
 }  // namespace roah::logging::webv
