@@ -2,12 +2,14 @@
 # This software is released under the MIT License.
 # See the LICENSE file in the project root for more details.
 
-roah_add_library(roah-assert
+find_package(toml11 REQUIRED)
+
+roah_add_library(roah-subprocess
     SOURCES
-        assert.cpp
+        process_id.cpp
 
     HEADERS
-        roah/assert.hpp
+        roah/process_id.hpp
 
     TESTS
         main.cpp

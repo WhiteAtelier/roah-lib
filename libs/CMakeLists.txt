@@ -6,6 +6,10 @@ if (BUILD_ROAH_ASSERT)
     add_subdirectory(assert)
 endif()
 
+if (BUILD_ROAH_SUBPROCESS)
+    add_subdirectory(subprocess)
+endif()
+
 if (BUILD_ROAH_LOGGER)
     add_subdirectory(logger)
 endif()

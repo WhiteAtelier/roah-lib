@@ -9,12 +9,12 @@ roah_add_library(roah-config
         toml11::toml11
 
     SOURCES
-        config_error.cpp
+        config_loader_error.cpp
         config_loader.cpp
 
     HEADERS
+        roah/config_loader_error.hpp
         roah/config_loader.hpp
-        roah/config_error.hpp
 
     TESTS
         main.cpp

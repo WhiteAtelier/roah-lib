@@ -1,0 +1,10 @@
+// clang-format off
+// THIS FILE IS AUTO GENERATED.
+#include <array>
+#include <cstddef>
+#include <string_view>
+#include <utility>
+namespace roah::logging::webv::embedded{
+std::pair<const void *, std::size_t> getFile(const std::string_view relpath) {
+@CONTENTS@
+return {nullptr, 0}; }}

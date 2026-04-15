@@ -1,10 +1,9 @@
-// Copyright (C) 2026 White Atelier
-// This software is released under the MIT License.
-// See the LICENSE file in the project root for more details.
+// This file contains code generated with the assistance of Claude (Anthropic),
+// an AI assistant. The generated code is provided as-is.
 
 #include <gtest/gtest.h>
-#include <roah/config_error.hpp>
 #include <roah/config_loader.hpp>
+#include <roah/config_loader_error.hpp>
 
 #include <filesystem>
 #include <string>

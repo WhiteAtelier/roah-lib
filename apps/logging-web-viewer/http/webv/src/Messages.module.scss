@@ -1,0 +1,102 @@
+.messages {
+    flex: 1;
+    overflow: auto scroll;
+
+    .messagesTable {
+        position: relative;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        border-collapse: collapse;
+
+        td,
+        th {
+            text-wrap: nowrap;
+        }
+
+        td {
+            // vertical-align: top;
+        }
+
+        thead {
+            th {
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                background-color: #444444;
+                padding: 0.05rem 0.5rem;
+            }
+
+            th:last-child {
+                width: 100%;
+            }
+        }
+
+        tbody {
+            tr:hover {
+                background-color: #2a2a2a;
+            }
+
+            td {
+                padding: 0.05rem 0.2rem;
+                border-bottom: 1px solid #303030;
+            }
+
+            .level {
+                text-align: center;
+            }
+        }
+
+        .levelTrace {
+            .level,
+            .messageContent {
+                color: #999999;
+            }
+        }
+        .levelDebug {
+            .level,
+            .messageContent {
+                color: #14a9ee;
+            }
+        }
+        .levelInfo {
+            .level,
+            .messageContent {
+                color: #15ff34;
+            }
+        }
+        .levelWarn {
+            .level,
+            .messageContent {
+                color: #e5e510;
+            }
+        }
+        .levelError {
+            .level,
+            .messageContent {
+                color: #ff0202;
+            }
+        }
+        .levelCritical {
+            background-color: #e51010 !important;
+            color: #000000;
+
+            .level {
+                font-weight: 600;
+            }
+        }
+
+        .process,
+        .thread {
+            text-align: right;
+        }
+
+        .messageContent {
+            text-wrap: wrap !important;
+        }
+
+        .detail {
+            text-wrap: wrap !important;
+        }
+    }
+}

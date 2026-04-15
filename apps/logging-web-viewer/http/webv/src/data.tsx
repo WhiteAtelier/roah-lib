@@ -1,0 +1,27 @@
+export type logLevel = "trace" | "debug" | "info" | "warn" | "error" | "critical";
+
+export interface LogEntry {
+    applicationName: string;
+    timestamp: Date;
+    process: number;
+    thread: number;
+    level: logLevel;
+    name: string;
+    message: string;
+    source: string;
+    line: number;
+    functionName: string;
+}
+
+export interface Filterables {
+    processes: number[];
+    threads: number[];
+    names: string[];
+}
+
+export interface FilterSet {
+    process?: Set<number>;
+    thread?: Set<number>;
+    level?: Set<logLevel>;
+    name?: Set<string>;
+}

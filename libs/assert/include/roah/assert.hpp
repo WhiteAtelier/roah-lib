@@ -135,29 +135,44 @@ private:
 #endif
 
 // --- Coding Error Macros ---
-#define ROAH_CODING_ERROR(expr)                                                    \
-    if (!(expr)) [[unlikely]]                                                      \
-    {                                                                              \
-        ::roah::CodingError::printMessage(#expr, std::source_location::current()); \
-        throw ::roah::CodingError{ #expr, std::source_location::current() };       \
+// 波かっこ初期化は, テストの時に不都合であったため丸かっこに変更した
+#define ROAH_CODING_ERROR(expr)                                                       \
+    if (!(expr)) [[unlikely]]                                                         \
+    {                                                                                 \
+        ::roah::AssertionError::printMessage(#expr, std::source_location::current()); \
+        throw ::roah::AssertionError(#expr, std::source_location::current());         \
     }
-#define ROAH_CODING_ERROR_C(expr)                                                  \
-    if constexpr (!(expr))                                                         \
-    {                                                                              \
-        ::roah::CodingError::printMessage(#expr, std::source_location::current()); \
-        throw ::roah::CodingError{ #expr, std::source_location::current() };       \
+#define ROAH_CODING_ERROR_C(expr)                                                     \
+    if constexpr (!(expr))                                                            \
+    {                                                                                 \
+        ::roah::AssertionError::printMessage(#expr, std::source_location::current()); \
+        throw ::roah::AssertionError(#expr, std::source_location::current());         \
     }
-#define ROAH_CODING_ERROR_M(expr, msg)                                                  \
-    if (!(expr)) [[unlikely]]                                                           \
-    {                                                                                   \
-        ::roah::CodingError::printMessage(#expr, std::source_location::current(), msg); \
-        throw ::roah::CodingError{ #expr, std::source_location::current() };            \
+#define ROAH_CODING_ERROR_M(expr, msg)                                                     \
+    if (!(expr)) [[unlikely]]                                                              \
+    {                                                                                      \
+        ::roah::AssertionError::printMessage(#expr, std::source_location::current(), msg); \
+        throw ::roah::AssertionError(#expr, std::source_location::current());              \
     }
-#define ROAH_CODING_ERROR_M_C(expr, msg)                                                \
-    if constexpr (!(expr))                                                              \
-    {                                                                                   \
-        ::roah::CodingError::printMessage(#expr, std::source_location::current(), msg); \
-        throw ::roah::CodingError{ #expr, std::source_location::current() };            \
+#define ROAH_CODING_ERROR_M_C(expr, msg)                                                   \
+    if constexpr (!(expr))                                                                 \
+    {                                                                                      \
+        ::roah::AssertionError::printMessage(#expr, std::source_location::current(), msg); \
+        throw ::roah::AssertionError(#expr, std::source_location::current());              \
     }
+
+#ifdef ROAH_DEBUG
+#    define ROAH_VERIFY(expr)                                    \
+        [sl = std::source_location::current()](bool v) {         \
+            if (!v)                                              \
+            {                                                    \
+                ::roah::AssertionError::printMessage(#expr, sl); \
+                assert(false && #expr);                          \
+            }                                                    \
+            return v;                                            \
+        }((expr))
+#else
+#    define ROAH_VERIFY(expr) (expr)
+#endif
 
 #endif

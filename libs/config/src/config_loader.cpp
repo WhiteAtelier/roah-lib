@@ -4,7 +4,7 @@
 
 #include "roah/config_loader.hpp"
 
-#include "roah/config_error.hpp"
+#include "roah/config_loader_error.hpp"
 
 #include <toml.hpp>
 
@@ -92,11 +92,11 @@ roah::ConfigLoader::load(const std::filesystem::path & path)
     }
     catch (const std::exception & e)
     {
-        throw ConfigError{ e.what() };
+        throw ConfigLoaderError{ e.what() };
     }
     catch (...)
     {
-        throw ConfigError{ "Unknown error occurred while loading config file: " + path.string() };
+        throw ConfigLoaderError{ "Unknown error occurred while loading config file: " + path.string() };
     }
 }
 

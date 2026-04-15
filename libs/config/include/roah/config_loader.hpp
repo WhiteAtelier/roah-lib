@@ -2,8 +2,8 @@
 // This software is released under the MIT License.
 // See the LICENSE file in the project root for more details.
 
-#ifndef ROAH_SERV_CONFIG_LOADER_HPP
-#define ROAH_SERV_CONFIG_LOADER_HPP
+#ifndef ROAH_CONFIG_LOADER_HPP
+#define ROAH_CONFIG_LOADER_HPP
 
 #include <cstdint>
 #include <filesystem>
@@ -28,7 +28,7 @@ public:
     /// 空の ConfigLoader を構築する.
     ConfigLoader() noexcept;
 
-    /// @brief Descriptor.
+    /// @brief Destructor.
     ~ConfigLoader() noexcept;
 
     /// @brief Move constructor.

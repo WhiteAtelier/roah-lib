@@ -1,0 +1,65 @@
+.filterComponent {
+    .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        // background-color: #101010;
+
+        .tabSelector {
+            padding: 0.25rem 1rem;
+            cursor: pointer;
+            background-color: #333333;
+            border-right: 1px solid #101010;
+            border-top-left-radius: 0.4rem;
+            border-top-right-radius: 0.4rem;
+            user-select: none;
+        }
+
+        .tabSelectorSelected {
+            background-color: #14a9ee;
+            color: #000000;
+        }
+    }
+
+    .filters {
+        display: flex;
+        flex-wrap: wrap;
+        border-bottom: 1px solid #101010;
+        margin-bottom: 0.2rem;
+        user-select: none;
+        align-items: center;
+
+        .filterGroup {
+            display: flex;
+            align-items: center;
+
+            > div {
+                cursor: pointer;
+            }
+        }
+
+        .clientsInfo {
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+
+            > p {
+                padding: 0 0.5rem;
+            }
+        }
+    }
+}
+
+.selector {
+    padding: 0.25rem 1rem;
+    cursor: pointer;
+    background-color: #333333;
+    border-right: 1px solid #101010;
+}
+
+.selectorSelected {
+    background-color: #14a9ee;
+    color: #000000;
+}

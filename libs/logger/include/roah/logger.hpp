@@ -5,8 +5,8 @@
 #ifndef ROAH_LOGGER_HPP
 #define ROAH_LOGGER_HPP
 
-#include <array>
-#include <filesystem>
+#include "detail/logger_types.hpp"
+
 #include <format>
 #include <memory>
 #include <source_location>
@@ -14,18 +14,6 @@
 #include <string_view>
 
 namespace roah {
-
-/// @brief ログの重要度レベル.
-enum struct LogLevel : int
-{
-    Trace = 0,  ///< トレース目的.
-    Debug,      ///< デバッグ.
-    Info,       ///< ユーザーに知らせるべき情報.
-    Warn,       ///< ユーザーに知らせるべき警告.
-    Error,      ///< 続行可能なエラー.
-    Critical,   ///< 致命的なエラー.
-    Off,        ///< (Off)
-};
 
 /// @brief ロガークラス.
 ///
@@ -86,8 +74,8 @@ public:
     void
     flush() const;
 
-    void
-    setLogLevel(const LogLevel log_level);
+    // void
+    // setLogLevel(const LogLevel log_level);
 
     static void
     setAllLogLevel(const LogLevel log_level);
@@ -102,34 +90,24 @@ private:
          const std::format_args &     args) const;
 
     static void
-    _initialize(const LogLevel log_level, const std::filesystem::path & log_file);
+    _initialize(const std::string_view application_name, const LoggerInitializeArgs & args);
 
-    static void
-    _resetAll();
+    // static void
+    //_resetAll();
 
     std::shared_ptr<Impl_> impl_;
 
     // --- friends ---
     friend void
-    initializeLogger(const LogLevel, const std::filesystem::path &);
+    initializeLogger(const std::string_view, const LoggerInitializeArgs &);
     friend void
     resetAllLoggers();
 };
 
 extern Logger lg_default;
 
-/// @brief ログシステムを初期化する.
-///
-/// この関数はアプリケーション開始時に一度だけ呼び出すこと.
-///
-/// @param log_level
-///     出力するログの最低レベル.
-///
-/// @param log_file
-///     ログ出力先のファイルパス. 空の場合, ファイル出力は行われない.
-///     有効なパスの場合, ディレクトリはすでに存在していなければならない.
 void
-initializeLogger(const LogLevel log_level, const std::filesystem::path & log_file);
+initializeLogger(const std::string_view application_name, const LoggerInitializeArgs & args);
 
 LogLevel
 getLogLevelFromString(const std::string_view level_str);
