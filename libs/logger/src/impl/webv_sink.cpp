@@ -98,6 +98,11 @@ roah::logger::impl::WebVSink<Mutex>::sink_it_(const spdlog::details::log_msg & m
         { "lno", msg.source.line },
         { "fnc", msg.source.funcname },
     });
+
+    if (msg.level >= spdlog::level::err)
+    {
+        this->flush_();
+    }
 }
 
 template <typename Mutex>
