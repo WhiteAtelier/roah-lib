@@ -14,6 +14,7 @@
 
 #include <cstring>
 #include <format>
+#include <iostream>
 #include <memory>
 #include <unordered_map>
 
@@ -53,6 +54,10 @@ roah::logging::webv::RestAPIServer::start()
 
     this->server_.start();
     this->started_ = true;
+
+    std::cout << "Webpage Address: http://" << this->config_.getServerHost()  //
+              << ":" << this->config_.getHttpServerPort() << std::endl;
+
     return true;
 }
 

@@ -19,6 +19,7 @@
 int
 main(const int argc, const char * const argv[])
 {
+    // TODO: 主要な項目はコマンドラインから上書きできるようにしたい
     std::filesystem::path config_path;
     CLI::App              app{ "roah logging webviewer" };
     app.add_option("-c,--config", config_path, "Path to configuration file")  //

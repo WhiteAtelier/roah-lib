@@ -74,7 +74,9 @@ roah::logging::webv::WebsocketServer::_onClientMessageReceived(std::shared_ptr<i
                   "Websocket connection opened: {}:{}",
                   connection_state->getRemoteIp(),
                   connection_state->getRemotePort());
-        this->_reportClientCount(this->server_.getClients().size());
+
+        // 今 subscribe しているクライアントに向けて通知
+        this->_reportClientCount(this->server_.getClients().size(), nullptr);
         break;
 
     case ix::WebSocketMessageType::Close:  //
@@ -84,8 +86,6 @@ roah::logging::webv::WebsocketServer::_onClientMessageReceived(std::shared_ptr<i
                   connection_state->getRemotePort(),
                   msg->closeInfo.code,
                   msg->closeInfo.reason);
-
-        this->_reportClientCount(this->server_.getClients().size() - 1);
 
         // 削除されるクライアントを Subscribers クライアントから削除する
         for (auto iter = this->subscribers_.begin(); iter != this->subscribers_.end();)
@@ -98,6 +98,16 @@ roah::logging::webv::WebsocketServer::_onClientMessageReceived(std::shared_ptr<i
             {
                 iter = this->subscribers_.erase(iter);
             }
+        }
+
+        {
+            std::size_t client_count = this->server_.getClients().size();
+            if (client_count > 0)
+            {
+                --client_count;  // クライアントはまだ削除されていないので, 1 を減らす
+            }
+            // 残った subscribe クライアントへ
+            this->_reportClientCount(client_count, nullptr);
         }
         break;
 
@@ -133,6 +143,9 @@ roah::logging::webv::WebsocketServer::_onClientMessageReceived(std::shared_ptr<i
                           "Client subscribed to updates: {}:{}",
                           connection_state->getRemoteIp(),
                           connection_state->getRemotePort());
+
+                // 新しい subscriber へ
+                this->_reportClientCount(this->server_.getClients().size(), &ws);
             }
             else if (type == "logs")
             {
@@ -160,15 +173,25 @@ roah::logging::webv::WebsocketServer::_onClientMessageReceived(std::shared_ptr<i
 }
 
 void
-roah::logging::webv::WebsocketServer::_reportClientCount(const std::size_t count)
+roah::logging::webv::WebsocketServer::_reportClientCount(const std::size_t count, ix::WebSocket * const dst)
 {
     nlohmann::json j_data{
         { "type", "client-count" },
         { "count", count },
     };
     const auto j_str = j_data.dump();
-    for (const auto & client : this->server_.getClients())
+    if (dst != nullptr)
     {
-        client->sendUtf8Text(j_str);
+        dst->sendUtf8Text(j_str);
+    }
+    else
+    {
+        for (const auto & client : this->subscribers_)
+        {
+            if (const auto ptr = client.lock(); ptr)
+            {
+                ptr->sendUtf8Text(j_str);
+            }
+        }
     }
 }
