@@ -5,6 +5,9 @@
 @PACKAGE_INIT@
 
 if (@BUILD_ROAH_ASSERT@)
+    add_compile_definitions(
+        $<$<CONFIG:Debug>:ROAH_ASSERT_ENABLE=1>
+    )
 endif()
 
 if (@BUILD_ROAH_SUBPROCESS@)
