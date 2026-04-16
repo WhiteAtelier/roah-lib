@@ -105,7 +105,7 @@ private:
 }  // namespace roah
 
 // --- Assertion Macros ---
-#ifdef ROAH_DEBUG
+#ifdef ROAH_ASSERT_ENABLE
 #    include <cassert>
 #    define ROAH_ASSERTION(expr)                                                          \
         if (!(expr)) [[unlikely]]                                                         \
@@ -125,7 +125,7 @@ private:
 #endif
 
 // --- Not Implemented Macro ---
-#ifdef ROAH_DEBUG
+#ifdef ROAH_ASSERT_ENABLE
 #    define ROAH_NOT_IMPLEMENTED()                                                                \
         ::roah::AssertionError::printMessage("NOT IMPLEMENTED", std::source_location::current()); \
         assert(false && "NOT IMPLEMENTED")
@@ -161,7 +161,7 @@ private:
         throw ::roah::AssertionError(#expr, std::source_location::current());              \
     }
 
-#ifdef ROAH_DEBUG
+#ifdef ROAH_ASSERT_ENABLE
 #    define ROAH_VERIFY(expr)                                    \
         [sl = std::source_location::current()](bool v) {         \
             if (!v)                                              \
@@ -170,7 +170,7 @@ private:
                 assert(false && #expr);                          \
             }                                                    \
             return v;                                            \
-        }((expr))
+        }(static_cast<bool>(expr))
 #else
 #    define ROAH_VERIFY(expr) (expr)
 #endif
