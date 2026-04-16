@@ -6,8 +6,8 @@ import { Component, createSignal, For, Show } from "solid-js";
 import { Filterables, FilterSet, logLevel } from "./data";
 import style from "./FilterComponent.module.scss";
 
-const Selector: Component<{ label: logLevel; onChanged?: (v: boolean) => void }> = (props) => {
-    const [selected, setSelected] = createSignal(true);
+const Selector: Component<{ label: string; initial?: boolean; onChanged?: (v: boolean) => void }> = (props) => {
+    const [selected, setSelected] = createSignal(props.initial ?? true);
     return (
         <div
             class={`${style.selector} ${selected() ? style.selectorSelected : ""}`}
@@ -15,6 +15,19 @@ const Selector: Component<{ label: logLevel; onChanged?: (v: boolean) => void }>
                 const newValue = !selected();
                 setSelected(newValue);
                 props.onChanged?.(newValue);
+            }}
+        >
+            {props.label}
+        </div>
+    );
+};
+
+const Toggler: Component<{ label: string; value?: boolean; setValue?: (v: boolean) => void }> = (props) => {
+    return (
+        <div
+            class={`${style.selector} ${props.value ? style.selectorSelected : ""}`}
+            onClick={() => {
+                props.setValue?.(!props.value);
             }}
         >
             {props.label}
@@ -40,6 +53,9 @@ const FilterComponent: Component<{
     clientsCount?: number;
     statusIndex: number;
     port: number;
+    autoScroll: boolean;
+    setAutoScroll: (v: boolean) => void;
+    stopLogs: (stop: boolean) => void;
 }> = (props) => {
     const [selectedTab, setSelectedTab] = createSignal<string | undefined>();
 
@@ -68,6 +84,19 @@ const FilterComponent: Component<{
     return (
         <div class={style.filterComponent}>
             <div class={style.filters}>
+                <div class={style.filterGroup}>
+                    <div>COMMANDS: </div>
+                    <Toggler
+                        label="Auto Scroll"
+                        value={props.autoScroll}
+                        setValue={props.setAutoScroll}
+                    />
+                    <Selector
+                        label="Stop"
+                        initial={false}
+                        onChanged={props.stopLogs}
+                    />
+                </div>
                 <div class={style.filterGroup}>
                     <div>LEVELS: </div>
                     <Selector

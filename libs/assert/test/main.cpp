@@ -219,7 +219,7 @@ TEST(VerifyDebugTest, ReturnsTrueWhenTrue)
 
 TEST(VerifyDebugTest, TriggersAssertWhenFalse)
 {
-    EXPECT_DEATH((void)ROAH_VERIFY(false), "");
+    EXPECT_DEATH(ROAH_VERIFY(false), "");
 }
 
 #else  // !ROAH_DEBUG
@@ -246,6 +246,10 @@ TEST(NotImplementedReleaseTest, OnlyCallsPrintMessageWithoutAbort)
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifdef ROAH_ASSERT_LOGGER_ENABLE
+#    include "roah/logger.hpp"
+#endif
+
 int
 main(int argc, char ** argv)
 {
@@ -257,6 +261,11 @@ main(int argc, char ** argv)
     _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
     _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
 #endif
+
+#ifdef ROAH_ASSERT_LOGGER_ENABLE
+    roah::initializeLogger("roah-assert-test", {});
+#endif
+
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

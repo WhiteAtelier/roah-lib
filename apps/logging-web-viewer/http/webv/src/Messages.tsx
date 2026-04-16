@@ -2,9 +2,14 @@
 // This software is released under the MIT License.
 // See the LICENSE file in the project root for more details.
 
-import { Component, createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
+import { Component, createMemo, createSignal, For, Show } from "solid-js";
 import { FilterSet, LogEntry } from "./data";
 import style from "./Messages.module.scss";
+
+interface HighlightItem {
+    thread?: number;
+    process?: number;
+}
 
 const formatTimestamp = (d: Date): string => {
     const MM = String(d.getMonth() + 1).padStart(2, "0");
@@ -16,16 +21,22 @@ const formatTimestamp = (d: Date): string => {
     return `${MM}/${dd} ${hh}:${mm}:${ss}.${sss}`;
 };
 
-const Message: Component<{ log: LogEntry; filter: FilterSet }> = (props) => {
+const filterMessage = (log: LogEntry, filter: FilterSet): boolean => {
     const flg = (v?: boolean) => v !== false;
-    const visible = createMemo(() => {
-        return (
-            flg(props.filter.process?.has(props.log.process)) &&
-            flg(props.filter.thread?.has(props.log.thread)) &&
-            flg(props.filter.level?.has(props.log.level)) &&
-            flg(props.filter.name?.has(props.log.name))
-        );
-    });
+    return (
+        flg(filter.process?.has(log.process)) &&
+        flg(filter.thread?.has(log.thread)) &&
+        flg(filter.level?.has(log.level)) &&
+        flg(filter.name?.has(log.name))
+    );
+};
+
+const Message: Component<{
+    log: LogEntry;
+    filter: FilterSet;
+    hlt: HighlightItem;
+    setHighlighter: (item: HighlightItem) => void;
+}> = (props) => {
     const trStyle = createMemo(() => {
         switch (props.log.level) {
             case "trace":
@@ -45,16 +56,44 @@ const Message: Component<{ log: LogEntry; filter: FilterSet }> = (props) => {
         }
     });
     const [showDetails, setShowDetails] = createSignal(false);
+    const onProcessHover = () => {
+        props.setHighlighter({ process: props.log.process });
+    };
+    const onThreadHover = () => {
+        props.setHighlighter({ thread: props.log.thread });
+    };
+    const onProcessLeave = () => {
+        if (props.hlt.process === props.log.process) {
+            props.setHighlighter({ process: undefined, thread: props.hlt.thread });
+        }
+    };
+    const onThreadLeave = () => {
+        if (props.hlt.thread === props.log.thread) {
+            props.setHighlighter({ process: props.hlt.process, thread: undefined });
+        }
+    };
     return (
-        <Show when={visible()}>
+        <>
             <tr
                 class={`${style.message} ${trStyle()}`}
-                onClick={() => setShowDetails(!showDetails())}
+                onDblClick={() => setShowDetails(!showDetails())}
             >
                 <td class={style.level}>{props.log.level}</td>
                 <td class={style.timestamp}>{formatTimestamp(props.log.timestamp)}</td>
-                <td class={style.process}>{props.log.process}</td>
-                <td class={style.thread}>{props.log.thread}</td>
+                <td
+                    class={`${style.process} ${props.hlt.process === props.log.process ? style.highlight : ""}`}
+                    onMouseEnter={onProcessHover}
+                    onMouseLeave={onProcessLeave}
+                >
+                    {props.log.process}
+                </td>
+                <td
+                    class={`${style.thread} ${props.hlt.thread === props.log.thread ? style.highlight : ""}`}
+                    onMouseEnter={onThreadHover}
+                    onMouseLeave={onThreadLeave}
+                >
+                    {props.log.thread}
+                </td>
                 <td class={style.applicationName}>{props.log.applicationName}</td>
                 <td class={style.name}>{props.log.name}</td>
                 <td class={style.messageContent}>{props.log.message}</td>
@@ -70,13 +109,18 @@ const Message: Component<{ log: LogEntry; filter: FilterSet }> = (props) => {
                     </td>
                 </tr>
             </Show>
-        </Show>
+        </>
     );
 };
 
-const Messages: Component<{ logs: LogEntry[]; filter: FilterSet }> = (props) => {
+const Messages: Component<{ logs: LogEntry[]; filter: FilterSet; ref?: (el: HTMLDivElement) => void }> = (props) => {
+    const [highlighter, setHighlighter] = createSignal<HighlightItem>({});
+
     return (
-        <div class={style.messages}>
+        <div
+            class={style.messages}
+            ref={props.ref}
+        >
             <table class={style.messagesTable}>
                 <thead>
                     <tr>
@@ -90,11 +134,13 @@ const Messages: Component<{ logs: LogEntry[]; filter: FilterSet }> = (props) => 
                     </tr>
                 </thead>
                 <tbody>
-                    <For each={props.logs}>
+                    <For each={props.logs.filter((log) => filterMessage(log, props.filter)).slice(-1000)}>
                         {(log) => (
                             <Message
                                 log={log}
                                 filter={props.filter}
+                                hlt={highlighter()}
+                                setHighlighter={setHighlighter}
                             />
                         )}
                     </For>

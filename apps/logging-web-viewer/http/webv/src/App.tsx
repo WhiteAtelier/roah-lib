@@ -2,9 +2,9 @@
 // This software is released under the MIT License.
 // See the LICENSE file in the project root for more details.
 
-import { createMemo, createResource, createSignal, Component } from "solid-js";
+import { createMemo, createResource, createSignal, Component, Show } from "solid-js";
 import { createStore } from "solid-js/store";
-import { createReconnectingWS, createWSState, WSMessage } from "@solid-primitives/websocket";
+import { createReconnectingWS, createWSState } from "@solid-primitives/websocket";
 import { Filterables, FilterSet, LogEntry } from "./data";
 import Messages from "./Messages";
 import FilterComponent from "./FilterComponent";
@@ -13,6 +13,7 @@ import "./App.scss";
 
 const App: Component = () => {
     const [logs, setLogs] = createStore<LogEntry[]>([]);
+    const [pausedLogs, setPausedLogs] = createSignal<LogEntry[] | null>(null);
     const [filterables, setFilterables] = createSignal<Filterables>({
         processes: [],
         threads: [],
@@ -21,9 +22,14 @@ const App: Component = () => {
     const [filterSet, setFilterSet] = createSignal<FilterSet>({
         level: new Set(["trace", "debug", "info", "warn", "error", "critical"]),
     });
+    const [autoScroll, setAutoScroll] = createSignal(true);
+    let messagesEl: HTMLDivElement | undefined;
+
     const [clients, setClients] = createSignal(0);
 
     const [rWsPort] = createResource(async () => {
+        return 32124; // TEMP
+
         const response = await fetch("/api/wsport");
         const data = await response.json();
         return data.port as number;
@@ -55,9 +61,29 @@ const App: Component = () => {
                             functionName: v.fnc,
                         }) as LogEntry,
                 );
-                const MAX_LOGS = 5000;
+                const MAX_LOGS = 20000;
                 setLogs((logs) => {
-                    const merged = [...logs, ...newlogs].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+                    // logs, newlogs はともにソート済み.
+                    const merged = [...logs];
+                    let i = 0;
+                    for (; i < newlogs.length; i++) {
+                        const log = newlogs[i];
+                        // merged の後ろから log.timestamp より古いものを探す
+                        let insertIdx = merged.length;
+                        while (insertIdx > 0 && merged[insertIdx - 1].timestamp.getTime() > log.timestamp.getTime()) {
+                            insertIdx--;
+                        }
+                        // もしも挿入場所が末尾だった場合は, for を break する.
+                        if (insertIdx === merged.length) {
+                            break;
+                        }
+                        // その場所に log を挿入する.
+                        merged.splice(insertIdx, 0, log);
+                    }
+                    // 残った newlogs について, 単純に merged に連結する.
+                    merged.push(...newlogs.slice(i));
+
+                    // 最後切り詰める
                     return merged.length > MAX_LOGS ? merged.slice(merged.length - MAX_LOGS) : merged;
                 });
 
@@ -84,6 +110,12 @@ const App: Component = () => {
                         names: [...names].sort(),
                     };
                 });
+
+                if (autoScroll()) {
+                    queueMicrotask(() => {
+                        if (messagesEl) messagesEl.scrollTop = messagesEl.scrollHeight;
+                    });
+                }
             }
         });
         ws.addEventListener("open", () => {
@@ -96,6 +128,15 @@ const App: Component = () => {
         };
     });
 
+    const stopLogs = (stop: boolean) => {
+        if (stop) {
+            console.log("PAUSE!");
+            setPausedLogs([...logs]);
+        } else {
+            setPausedLogs(null);
+        }
+    };
+
     return (
         <div class={style.app}>
             <FilterComponent
@@ -105,11 +146,26 @@ const App: Component = () => {
                 clientsCount={clients()}
                 statusIndex={websock()?.state() || 0}
                 port={websock()?.port ?? -1}
+                autoScroll={autoScroll()}
+                setAutoScroll={setAutoScroll}
+                stopLogs={stopLogs}
             />
-            <Messages
-                logs={logs}
-                filter={filterSet()}
-            />
+            <Show
+                when={pausedLogs() !== null}
+                fallback={
+                    <Messages
+                        logs={logs}
+                        filter={filterSet()}
+                        ref={(el) => (messagesEl = el)}
+                    />
+                }
+            >
+                <Messages
+                    logs={pausedLogs()!}
+                    filter={filterSet()}
+                    ref={(el) => (messagesEl = el)}
+                />
+            </Show>
         </div>
     );
 };

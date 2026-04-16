@@ -92,3 +92,12 @@ target_sources(roah-logging-web-viewer
     PRIVATE
         ${WEBV_BINPACK_CPP}
 )
+
+roah_add_executable(roah-logging-web-viewer-testclient
+    LIBRARIES
+        CLI11::CLI11
+        roah-logger
+
+    SOURCES
+        test_client.cpp
+)

@@ -8,9 +8,9 @@
 #include "roah/config_loader_error.hpp"
 
 roah::logging::webv::Config::Config()
-    : host_{}
-    , http_port_{ 0 }
-    , wss_port_{ 0 }
+    : host_{ "127.0.0.1" }
+    , http_port_{ 32123 }
+    , wss_port_{ 32124 }
 {}
 
 roah::logging::webv::Config::Config(Config &&) noexcept = default;
@@ -39,12 +39,18 @@ roah::logging::webv::Config::load([[maybe_unused]] const std::string_view arg0, 
 #endif
     }
 
+    // ファイルが存在しない場合はデフォルト値のまま返す.
+    if (!std::filesystem::exists(path))
+    {
+        return config;
+    }
+
     try
     {
         loader.load(path);
-        config.host_         = loader.getString("server", "host", "127.0.0.1");
-        const auto http_port = loader.getInt("server", "http_port", 32123);
-        const auto wss_port  = loader.getInt("server", "wss_port", 32124);
+        config.host_         = loader.getString("server", "host", config.host_);
+        const auto http_port = loader.getInt("server", "http_port", static_cast<std::int64_t>(config.http_port_));
+        const auto wss_port  = loader.getInt("server", "wss_port", static_cast<std::int64_t>(config.wss_port_));
 
         if (0 < http_port && http_port <= 65535)
         {

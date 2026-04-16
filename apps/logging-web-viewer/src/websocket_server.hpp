@@ -33,7 +33,7 @@ private:
                              const ix::WebSocketMessagePtr &         msg);
 
     void
-    _reportClientCount(const std::size_t count);
+    _reportClientCount(const std::size_t count, ix::WebSocket * const dst);
 
     const Config &                            config_;
     ix::WebSocketServer                       server_;

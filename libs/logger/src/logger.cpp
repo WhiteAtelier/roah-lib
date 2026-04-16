@@ -43,12 +43,6 @@ public:
     setupLogger(const std::vector<std::shared_ptr<spdlog::sinks::sink>> & sinks);
 
     void
-    resetLogger();
-
-    void
-    setLevel(const LogLevel log_level);
-
-    void
     log(const LogLevel               level,
         const std::source_location & source_location,
         const std::string_view       fmt,
@@ -62,9 +56,6 @@ public:
 
     static std::shared_ptr<Impl_>
     getOrCreateImpl(const std::string_view name);
-
-    static void
-    setAllLogLevel(const LogLevel log_level);
 
 private:
     const std::string               name_;
@@ -85,7 +76,8 @@ private:
 
 namespace {
 
-static roah::LogLevel initial_level_;
+static bool           _initialized = false;
+static roah::LogLevel _initial_level;
 
 struct Converter_
 {
@@ -144,7 +136,7 @@ roah::Logger::Impl_::_getSinks()
 // ============================================================================================= //
 roah::Logger::Impl_::Impl_(std::string && name)
     : name_{ std::move(name) }
-    , level_{ initial_level_ }
+    , level_{ _initial_level }
     , logger_{}
 {
     this->setupLogger();
@@ -152,13 +144,23 @@ roah::Logger::Impl_::Impl_(std::string && name)
 
 roah::Logger::Impl_::~Impl_() noexcept = default;
 
-roah::Logger::Logger(const std::string_view name)
-    : impl_{ Impl_::getOrCreateImpl(name) }
+roah::Logger::Logger()
+    : impl_{ Impl_::getOrCreateImpl("default") }
 {}
+
+roah::Logger::Logger(std::string name)
+    : impl_{ Impl_::getOrCreateImpl(std::move(name)) }
+{}
+
+roah::Logger::Logger(const Logger &) {}
 
 roah::Logger::Logger(Logger &&) noexcept = default;
 
 roah::Logger::~Logger() noexcept = default;
+
+roah::Logger &
+roah::Logger::operator=(const Logger &)
+    = default;
 
 roah::Logger &
 roah::Logger::operator=(Logger &&) noexcept
@@ -219,19 +221,10 @@ roah::Logger::Impl_::setupLogger(const std::vector<std::shared_ptr<spdlog::sinks
         {
             this->logger_ = std::make_shared<spdlog::logger>(this->name_, sinks.begin(), sinks.end());
             this->logger_->set_level(spdlog::level::trace);
-            this->level_ = initial_level_;
+            this->level_ = _initial_level;
             spdlog::register_logger(this->logger_);
         }
     }
-}
-
-// ============================================================================================= //
-// [IMPL] resetLogger()
-// ============================================================================================= //
-void
-roah::Logger::Impl_::resetLogger()
-{
-    this->logger_.reset();
 }
 
 // ============================================================================================= //
@@ -248,13 +241,10 @@ roah::Logger::Impl_::log(const LogLevel               level,
     {
         return;
     }
-
-#ifdef APINE_DEBUG
     if (!this->logger_) [[unlikely]]
     {
-        throw std::runtime_error{ "spdlog::logger is not initialized." };
+        return;
     }
-#endif
 
     // ログ出力 (spdlog)
     this->logger_->log(_converter(source_location), _converter(level), std::vformat(fmt, args));
@@ -266,35 +256,7 @@ roah::Logger::_log(const LogLevel               level,
                    const std::string_view       fmt,
                    const std::format_args &     args) const
 {
-#ifdef APINE_DEBUG
-    if (!this->impl_) [[unlikely]]
-    {
-        throw std::runtime_error{ "spdlog::logger is not initialized." };
-    }
-#endif
-
     this->impl_->log(level, source_location, fmt, args);
-}
-
-// ============================================================================================= //
-// setLevel()
-// ============================================================================================= //
-void
-roah::Logger::Impl_::setLevel(const LogLevel log_level)
-{
-    this->level_ = log_level;
-}
-
-void
-roah::Logger::setLevel(const LogLevel log_level)
-{
-#ifdef APINE_DEBUG
-    if (!this->impl_) [[unlikely]]
-    {
-        throw std::runtime_error{ "spdlog::logger is not initialized." };
-    }
-#endif
-    this->impl_->setLevel(log_level);
 }
 
 // ============================================================================================= //
@@ -303,18 +265,16 @@ roah::Logger::setLevel(const LogLevel log_level)
 void
 roah::Logger::Impl_::flush()
 {
+    if (!this->logger_) [[unlikely]]
+    {
+        return;
+    }
     this->logger_->flush();
 }
 
 void
 roah::Logger::flush() const
 {
-#ifdef APINE_DEBUG
-    if (!this->impl_) [[unlikely]]
-    {
-        throw std::runtime_error{ "spdlog::logger is not initialized." };
-    }
-#endif
     this->impl_->flush();
 }
 
@@ -340,6 +300,10 @@ roah::Logger::Impl_::getOrCreateImpl(const std::string_view name)
 void
 roah::Logger::Impl_::initialize(const std::string_view application_name, const LoggerInitializeArgs & args)
 {
+    if (_initialized)
+    {
+        return;
+    }
     if (application_name.empty())
     {
         throw std::invalid_argument{ "Application name must not be empty." };
@@ -348,11 +312,11 @@ roah::Logger::Impl_::initialize(const std::string_view application_name, const L
     std::vector<spdlog::sink_ptr> sinks;
     sinks.reserve(3);
 
-    initial_level_      = LogLevel::Off;
+    _initial_level      = LogLevel::Off;
     const auto lower_fn = [](const LogLevel level) {
-        if (initial_level_ > level)
+        if (_initial_level > level)
         {
-            initial_level_ = level;
+            _initial_level = level;
         }
     };
 
@@ -424,6 +388,8 @@ roah::Logger::Impl_::initialize(const std::string_view application_name, const L
     {
         logger->setupLogger(sinks);
     }
+
+    _initialized = true;
 }
 
 void
@@ -492,26 +458,4 @@ roah::getLogLevelString(const LogLevel log_level)
     case Off: return "off";
     default: return "unknown";
     }
-}
-
-void
-roah::Logger::Impl_::setAllLogLevel(const LogLevel log_level)
-{
-    std::lock_guard lock{ Impl_::_getMutex() };
-    for (const auto & logger : Logger::Impl_::_getLoggers() | std::views::values)
-    {
-        logger->setLevel(log_level);
-    }
-}
-
-void
-roah::Logger::setAllLogLevel(const LogLevel log_level)
-{
-    Impl_::setAllLogLevel(log_level);
-}
-
-void
-roah::setAllLogLevel(const LogLevel log_level)
-{
-    Logger::setAllLogLevel(log_level);
 }

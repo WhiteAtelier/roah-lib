@@ -74,6 +74,11 @@ roah::logger::impl::WebVSink<Mutex>::WebVSink(const std::string_view   host,
 template <typename Mutex>
 roah::logger::impl::WebVSink<Mutex>::~WebVSink() noexcept
 {
+    if (this->thread_.joinable())
+    {
+        this->thread_.request_stop();
+        this->thread_.join();
+    }
     this->ws_.stop();
 }
 
@@ -93,6 +98,11 @@ roah::logger::impl::WebVSink<Mutex>::sink_it_(const spdlog::details::log_msg & m
         { "lno", msg.source.line },
         { "fnc", msg.source.funcname },
     });
+
+    if (msg.level >= spdlog::level::err)
+    {
+        this->flush_();
+    }
 }
 
 template <typename Mutex>
@@ -116,6 +126,9 @@ roah::logger::impl::WebVSink<Mutex>::_flushProc(const std::stop_token & st)
         std::this_thread::sleep_for(interval);
         this->flush();
     }
+
+    // 最後に一度 flush する
+    this->flush();
 }
 
 template class roah::logger::impl::WebVSink<std::mutex>;
