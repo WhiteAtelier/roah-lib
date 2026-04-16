@@ -26,13 +26,24 @@ namespace roah {
 class Logger
 {
 public:
-    Logger(const std::string_view name);
+    /// @brief Default logger constructor.
+    explicit Logger();
+
+    /// @brief 名前付きロガー.
+    explicit Logger(std::string name);
+
+    /// @brief Copy constructor.
+    Logger(const Logger &);
 
     /// @brief Move constructor.
     Logger(Logger &&) noexcept;
 
     /// @brief Destructor.
     ~Logger() noexcept;
+
+    /// @brief Copy assignment operator.
+    Logger &
+    operator=(const Logger &);
 
     /// @brief Move assignment operator.
     Logger &
@@ -44,10 +55,6 @@ public:
     /// @brief 有効な Logger インスタンスを保持していないか.
     bool
     operator!() const noexcept;
-
-    /// @brief ログレベルを設定する.
-    void
-    setLevel(const LogLevel log_level);
 
     /// @brief ログを出力する.
     ///
@@ -74,12 +81,6 @@ public:
     void
     flush() const;
 
-    // void
-    // setLogLevel(const LogLevel log_level);
-
-    static void
-    setAllLogLevel(const LogLevel log_level);
-
 private:
     class Impl_;
 
@@ -91,9 +92,6 @@ private:
 
     static void
     _initialize(const std::string_view application_name, const LoggerInitializeArgs & args);
-
-    // static void
-    //_resetAll();
 
     std::shared_ptr<Impl_> impl_;
 
@@ -114,9 +112,6 @@ getLogLevelFromString(const std::string_view level_str);
 
 std::string_view
 getLogLevelString(const LogLevel log_level);
-
-void
-setAllLogLevel(const LogLevel log_level);
 
 #if ROAH_LOG_LEVEL == 0
 #    define ROAH_TRACE(logger, fmt, ...) \
