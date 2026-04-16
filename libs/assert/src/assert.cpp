@@ -11,6 +11,10 @@
 #include <stdexcept>
 #include <string_view>
 
+#ifdef ROAH_ASSERT_LOGGER_ENABLE
+#    include "roah/logger.hpp"
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // AssertionError class implementation
@@ -81,14 +85,32 @@ roah::AssertionError::printMessage(const std::string_view       expr,
                                    const std::source_location & source_location,
                                    const std::string_view       message)
 {
-    std::cerr << std::format("Assertion Fault. {} - {}#{} {}\n",
-                             expr,
-                             source_location.file_name(),
-                             source_location.line(),
-                             source_location.function_name())
-              << std::endl;
-    if (!message.empty())
+#ifdef ROAH_ASSERT_LOGGER_ENABLE
+    static const Logger logger{ "Roah-Assertion" };
+    if (logger)
     {
-        std::cerr << std::format("-- Message: {}\n", message);
+        ROAH_CRITICAL(logger,
+                      "Assertion Fault. {} - {}#{} {}()\n-- Message: {}",
+                      expr,
+                      source_location.file_name(),
+                      source_location.line(),
+                      source_location.function_name(),
+                      message);
+    }
+    else
+    {
+#else
+    {
+        std::cerr << std::format("Assertion Fault. {} - {}#{} {}\n",
+                                 expr,
+                                 source_location.file_name(),
+                                 source_location.line(),
+                                 source_location.function_name())
+                  << std::endl;
+        if (!message.empty())
+        {
+            std::cerr << std::format("-- Message: {}\n", message);
+        }
+#endif
     }
 }
