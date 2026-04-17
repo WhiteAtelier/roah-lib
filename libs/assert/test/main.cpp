@@ -1,7 +1,6 @@
 // This file contains code generated with the assistance of Claude (Anthropic),
 // an AI assistant. The generated code is provided as-is.
 
-// assert.hpp を先にインクルードすることで, ROAH_DEBUG 時に <cassert> が読み込まれる.
 #include "roah/assert.hpp"
 
 #include <gtest/gtest.h>
@@ -173,11 +172,11 @@ TEST(CodingErrorWithMessageConstexprTest, ThrowsAssertionErrorWhenFalse)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// ROAH_DEBUG 時のみ有効なテスト
+// ROAH_ASSERT_ENABLE 時のみ有効なテスト
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef ROAH_DEBUG
+#ifdef ROAH_ASSERT_ENABLE
 
 // assert が発火する = プロセス終了 のため, EXPECT_DEATH (子プロセスで実行して終了を観測)
 // を使う. GTest が子プロセスをスポーンするとき main() が再実行されるため,
@@ -222,7 +221,7 @@ TEST(VerifyDebugTest, TriggersAssertWhenFalse)
     EXPECT_DEATH(ROAH_VERIFY(false), "");
 }
 
-#else  // !ROAH_DEBUG
+#else  // !ROAH_ASSERT_ENABLE
 
 TEST(AssertionMacroReleaseTest, MacroExpandsToNothing)
 {
@@ -238,7 +237,7 @@ TEST(NotImplementedReleaseTest, OnlyCallsPrintMessageWithoutAbort)
     EXPECT_NO_THROW(ROAH_NOT_IMPLEMENTED());
 }
 
-#endif  // ROAH_DEBUG
+#endif  // ROAH_ASSERT_ENABLE
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
