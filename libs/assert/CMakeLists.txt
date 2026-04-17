@@ -27,8 +27,10 @@ if (BUILD_ROAH_ASSERT)
         PRIVATE
             roah-logger
     )
-    target_link_libraries(roah-assert-test
-        PRIVATE
-            roah-logger
-    )
+    if (TARGET roah-assert-test)
+        target_link_libraries(roah-assert-test
+            PRIVATE
+                roah-logger
+        )
+    endif()
 endif()
