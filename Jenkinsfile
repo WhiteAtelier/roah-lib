@@ -8,6 +8,12 @@ pipeline {
         CLI11_COMMIT            = '37bb6edc5317e99af72ef48405e65d9ca5218861'  // tag v2.6.2
         IXWEBSOCKET_COMMIT      = '2efe037c9cc96fd536774f17bdb5215161ee5087'  // tag v11.4.6
         NLOHMANN_JSON_COMMIT    = '55f93686c01528224f448c19128836e7df245f72'  // tag v3.12.0
+        DEPS_PREFIX_PATH        = "${WORKSPACE}/deps/spdlog;" +
+                                  "${WORKSPACE}/deps/toml11;" +
+                                  "${WORKSPACE}/deps/googletest;" +
+                                  "${WORKSPACE}/deps/cli11;" +
+                                  "${WORKSPACE}/deps/ixwebsocket;" +
+                                  "${WORKSPACE}/deps/nlohmann-json"
     }
 
     stages {
@@ -184,51 +190,75 @@ pipeline {
             }
         }
 
-        stage('Configure roah-lib') {
+        stage('Configure roah-lib (release)') {
             steps {
                 sh """
                     cmake -G Ninja -B "${WORKSPACE}/build" -S "${WORKSPACE}" \
                         -DCMAKE_BUILD_TYPE=Release \
                         -DCMAKE_INSTALL_PREFIX="${WORKSPACE}/install" \
-                        -DCMAKE_PREFIX_PATH="\
-${WORKSPACE}/deps/spdlog;\
-${WORKSPACE}/deps/toml11;\
-${WORKSPACE}/deps/googletest;\
-${WORKSPACE}/deps/cli11;\
-${WORKSPACE}/deps/ixwebsocket;\
-${WORKSPACE}/deps/nlohmann-json" \
+                        -DCMAKE_PREFIX_PATH="${DEPS_PREFIX_PATH}" \
                         -DBUILD_DOCS=1 \
                         -DBUILD_TESTS=1
                 """
             }
         }
 
-        stage('Build roah-lib') {
+        stage('Build roah-lib (release)') {
             steps {
                 sh "cmake --build '${WORKSPACE}/build'"
             }
         }
 
-        stage('Install roah-lib') {
+        stage('Install roah-lib (release)') {
             steps {
                 sh "cmake --install '${WORKSPACE}/build'"
             }
         }
 
-        stage('Run tests') {
+        stage('Run tests (release)') {
             steps {
-                sh "ctest --test-dir '${WORKSPACE}/build' --output-on-failure --output-junit '${WORKSPACE}/test-results.xml'"
+                sh "ctest --test-dir '${WORKSPACE}/build' --output-on-failure --output-junit '${WORKSPACE}/test-results-release.xml'"
             }
             post {
                 always {
-                    junit 'test-results.xml'
+                    junit 'test-results-release.xml'
                 }
             }
         }
 
-        stage('Save artifacts') {
+        stage('Configure roah-lib (debug)') {
             steps {
-                archiveArtifacts artifacts: 'install/**', followSymlinks: false
+                sh """
+                    cmake -G Ninja -B "${WORKSPACE}/build_d" -S "${WORKSPACE}" \
+                        -DCMAKE_BUILD_TYPE=Debug \
+                        -DCMAKE_INSTALL_PREFIX="${WORKSPACE}/install_d" \
+                        -DCMAKE_PREFIX_PATH="${DEPS_PREFIX_PATH}" \
+                        -DBUILD_DOCS=1 \
+                        -DBUILD_TESTS=1
+                """
+            }
+        }
+
+        stage('Build roah-lib (debug)') {
+            steps {
+                sh "cmake --build '${WORKSPACE}/build_d'"
+            }
+        }
+
+        stage('Install roah-lib (debug)') {
+            steps {
+                sh "cmake --install '${WORKSPACE}/build_d'"
+            }
+        }
+
+        stage('Run tests (debug)') {
+            steps {
+                sh "ctest --test-dir '${WORKSPACE}/build_d' --output-on-failure --output-junit '${WORKSPACE}/test-results-debug.xml'"
+            }
+            post {
+                always {
+                    junit 'test-results-debug.xml'
+                }
             }
         }
     }
