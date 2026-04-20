@@ -15,7 +15,7 @@
         "version": "1.16.0",
         "options": {
             "BuildGmock": null,
-            "CXXStandard": null,
+            "CXXStandard": "20",
             "Shared": null
         }
     },

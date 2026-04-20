@@ -38,6 +38,7 @@ option(BUILD_ROAH_ASSERT "Build libroah::roah-assert" ON)
 option(BUILD_ROAH_SUBPROCESS "Build libroah::roah-subprocess" ON)
 option(BUILD_ROAH_LOGGER "Build libroah::roah-logger" ON)
 option(BUILD_ROAH_CONFIG "Build libroah::roah-config" ON)
+option(BUILD_ROAH_STRING "Build libroah::roah-string" ON)
 option(BUILD_ROAH_URL_PARSER "Build libroah::roah-url-parser" ON)
 option(BUILD_APP_ROAH_LOGGING_WEB_VIEWER "Build logging-web-viewer app" ON)
 
@@ -68,6 +69,10 @@ endif()
 
 if (BUILD_ROAH_CONFIG)
     find_package(toml11 REQUIRED)
+endif()
+
+if (BUILD_ROAH_STRING)
+    # No dependencies for now
 endif()
 
 if (BUILD_ROAH_URL_PARSER)
