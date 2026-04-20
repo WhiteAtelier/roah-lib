@@ -18,6 +18,10 @@ if (BUILD_ROAH_CONFIG)
     add_subdirectory(config)
 endif()
 
+if (BUILD_ROAH_STRING)
+    add_subdirectory(string)
+endif()
+
 if (BUILD_ROAH_URL_PARSER)
     add_subdirectory(url-parser)
 endif()
