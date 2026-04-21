@@ -185,13 +185,13 @@ TEST(CodingErrorWithMessageConstexprTest, ThrowsAssertionErrorWhenFalse)
 TEST(AssertionMacroDebugTest, DoesNotTriggerAssertWhenConditionIsTrue)
 {
     // 条件が真のとき assert は発火せず, プロセスは継続する.
-    ROAH_ASSERTION(true);
+    ROAH_ASSERT(true);
     SUCCEED();
 }
 
 TEST(AssertionMacroDebugTest, TriggersAssertWhenConditionIsFalse)
 {
-    EXPECT_DEATH(ROAH_ASSERTION(false), "");
+    EXPECT_DEATH(ROAH_ASSERT(false), "");
 }
 
 TEST(AssertionConstexprDebugTest, DoesNotTriggerAssertWhenTrue)
@@ -225,9 +225,9 @@ TEST(VerifyDebugTest, TriggersAssertWhenFalse)
 
 TEST(AssertionMacroReleaseTest, MacroExpandsToNothing)
 {
-    // Release ビルドでは ROAH_ASSERTION は何も展開しない.
+    // Release ビルドでは ROAH_ASSERT は何も展開しない.
     // コンパイルが通ること自体がテスト.
-    ROAH_ASSERTION(false);
+    ROAH_ASSERT(false);
     SUCCEED();
 }
 
