@@ -29,7 +29,7 @@ public:
 
     /// @brief Constructor.
     ///
-    /// ROAH_ASSERTION マクロから呼び出されることを想定しています.
+    /// ROAH_ASSERT マクロから呼び出されることを想定しています.
     explicit AssertionError(const std::string_view expr, const std::source_location & source_location);
 
     /// @brief Copy constructor.
@@ -107,7 +107,7 @@ private:
 // --- Assertion Macros ---
 #ifdef ROAH_ASSERT_ENABLE
 #    include <cassert>
-#    define ROAH_ASSERTION(expr)                                                          \
+#    define ROAH_ASSERT(expr)                                                          \
         if (!(expr)) [[unlikely]]                                                         \
         {                                                                                 \
             ::roah::AssertionError::printMessage(#expr, std::source_location::current()); \
@@ -120,7 +120,7 @@ private:
             assert(false && #expr);                                                       \
         }
 #else
-#    define ROAH_ASSERTION(expr)
+#    define ROAH_ASSERT(expr)
 #    define ROAH_ASSERTION_C(expr)
 #endif
 
