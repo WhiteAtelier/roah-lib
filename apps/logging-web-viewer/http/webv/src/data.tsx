@@ -2,7 +2,7 @@
 // This software is released under the MIT License.
 // See the LICENSE file in the project root for more details.
 
-export type logLevel = "trace" | "debug" | "info" | "warn" | "error" | "critical";
+export type logLevel = "trace" | "debug" | "info" | "warning" | "error" | "critical";
 
 export interface LogEntry {
     applicationName: string;

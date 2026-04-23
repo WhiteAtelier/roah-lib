@@ -421,15 +421,15 @@ roah::getLogLevelFromString(const std::string_view level_str)
     {
         return LogLevel::Info;
     }
-    else if (level_str == "warn")
+    else if (level_str == "warn" || level_str == "warning")
     {
         return LogLevel::Warn;
     }
-    else if (level_str == "error")
+    else if (level_str == "err" || level_str == "error")
     {
         return LogLevel::Error;
     }
-    else if (level_str == "critical")
+    else if (level_str == "crit" || level_str == "critical")
     {
         return LogLevel::Critical;
     }
@@ -452,7 +452,7 @@ roah::getLogLevelString(const LogLevel log_level)
     case Trace: return "trace";
     case Debug: return "debug";
     case Info: return "info";
-    case Warn: return "warn";
+    case Warn: return "warning";
     case Error: return "error";
     case Critical: return "critical";
     case Off: return "off";
