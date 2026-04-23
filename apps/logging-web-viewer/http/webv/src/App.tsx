@@ -20,7 +20,7 @@ const App: Component = () => {
         names: [],
     });
     const [filterSet, setFilterSet] = createSignal<FilterSet>({
-        level: new Set(["trace", "debug", "info", "warn", "error", "critical"]),
+        level: new Set(["trace", "debug", "info", "warning", "error", "critical"]),
     });
     const [autoScroll, setAutoScroll] = createSignal(true);
     let messagesEl: HTMLDivElement | undefined;
