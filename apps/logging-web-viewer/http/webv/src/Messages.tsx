@@ -45,7 +45,7 @@ const Message: Component<{
                 return style.levelDebug;
             case "info":
                 return style.levelInfo;
-            case "warn":
+            case "warning":
                 return style.levelWarn;
             case "error":
                 return style.levelError;
