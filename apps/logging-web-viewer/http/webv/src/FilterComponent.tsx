@@ -112,8 +112,8 @@ const FilterComponent: Component<{
                         onChanged={(v) => updateLevelFilter("info", v)}
                     />
                     <Selector
-                        label="warn"
-                        onChanged={(v) => updateLevelFilter("warn", v)}
+                        label="warning"
+                        onChanged={(v) => updateLevelFilter("warning", v)}
                     />
                     <Selector
                         label="error"
