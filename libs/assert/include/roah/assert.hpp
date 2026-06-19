@@ -113,7 +113,7 @@ private:
             ::roah::AssertionError::printMessage(#expr, std::source_location::current()); \
             assert(false && #expr);                                                       \
         }
-#    define ROAH_ASSERTION_C(expr)                                                        \
+#    define ROAH_ASSERT_C(expr)                                                        \
         if constexpr (!(expr))                                                            \
         {                                                                                 \
             ::roah::AssertionError::printMessage(#expr, std::source_location::current()); \
@@ -121,7 +121,7 @@ private:
         }
 #else
 #    define ROAH_ASSERT(expr)
-#    define ROAH_ASSERTION_C(expr)
+#    define ROAH_ASSERT_C(expr)
 #endif
 
 // --- Not Implemented Macro ---
