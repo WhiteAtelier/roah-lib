@@ -17,12 +17,15 @@ namespace roah {
 
 /// @brief ロガークラス.
 ///
-/// 事前に用意された名前付きロガー. コンソールやファイルにログを出力する.
+/// 名前付きロガーのインスタンスです.
+/// コンソールやファイルにログを出力します.
 ///
-/// このログを使用する前に `initializeLogger()` による初期化が必要.
-/// また, このクラスの公開コンストラクタは用意されておらず,
+/// このログを使用する前に `initializeLogger()` による初期化が必要です.
 ///
-/// ログ出力は `log()` メソッドではなく, マクロを利用すること.
+/// ログ出力は `log()` メソッドではなく, マクロを利用してください.
+///
+/// このロガーは, 内部で spdlog を使用しています.
+/// spdlog の薄い wrapper です.
 class Logger
 {
 public:
@@ -66,6 +69,8 @@ public:
     /// - PASTEL_WARN : Warn Level, ユーザーに知らせるべき警告.
     /// - PASTEL_ERROR : Error Level, 続行可能なエラー.
     /// - PASTEL_CRITICAL : Critical Level, 致命的なエラー.
+    ///
+    /// 無効なロガーインスタンスに対してログ出力を行った場合は, 何も行われません.
     template <typename... Args>
     void
     log(const LogLevel               level,
@@ -98,20 +103,61 @@ private:
     // --- friends ---
     friend void
     initializeLogger(const std::string_view, const LoggerInitializeArgs &);
-    friend void
-    resetAllLoggers();
 };
 
+/// @brief デフォルトで用意されるロガー.
 extern Logger lg_default;
 
+/// @brief ロガーを初期化する.
+///
+/// @param application_name
+///     アプリケーション名.
+///
+/// @param args
+///    ロガー初期化用の引数.
 void
 initializeLogger(const std::string_view application_name, const LoggerInitializeArgs & args);
 
+/// @brief 文字列から LogLevel を取得する.
+///
+/// 無効なログレベル文字列が指定された場合は, invalid argument 例外を送出します.
+///
+/// @param level_str
+///     文字列で表現されたログレベル.
+///     `trace`, `debug`, `info`, `warn`, `warning`, `err`, `error`, `crit`, `critical` のいずれか.
+///
+/// @return
+///     変換された LogLevel. 変換できない場合は invalid argument 例外を送出します.
 LogLevel
 getLogLevelFromString(const std::string_view level_str);
 
+/// @brief 文字列から LogLevel を取得する.
+///
+/// 無効なログレベル文字列が指定された場合に, 第二引数のデフォルトのログレベルを返します.
+/// ログレベル文字列がユーザー指定の場合は, この関数を使用することを推奨します.
+///
+/// @param level_str
+///     文字列で表現されたログレベル.
+///     `trace`, `debug`, `info`, `warn`, `warning`, `err`, `error`, `crit`, `critical` のいずれか.
+///
+/// @param default_level
+///     指定されたログレベル文字列が, 有効なログレベル文字列でない場合に返すデフォルトのログレベル.
+///
+/// @return
+LogLevel
+getLogLevelFromString(const std::string_view level_str, const LogLevel default_level) noexcept;
+
+/// @brief 指定されたログレベルを文字列に変換する.
+///
+/// 下位から順に, `trace`, `debug`, `info`, `warning`, `error`, `critical`, `off` と変換されます.
+///
+/// @param log_level
+///     ログレベル.
+///
+/// @return
+///     ログレベル文字列.
 std::string_view
-getLogLevelString(const LogLevel log_level);
+getLogLevelString(const LogLevel log_level) noexcept;
 
 #if ROAH_LOG_LEVEL == 0
 #    define ROAH_TRACE(logger, fmt, ...) \
