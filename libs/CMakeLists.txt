@@ -10,6 +10,10 @@ if (BUILD_ROAH_SUBPROCESS)
     add_subdirectory(subprocess)
 endif()
 
+if (BUILD_ROAH_ENV)
+    add_subdirectory(env)
+endif()
+
 if (BUILD_ROAH_LOGGER)
     add_subdirectory(logger)
 endif()
