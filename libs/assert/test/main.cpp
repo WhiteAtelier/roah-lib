@@ -196,13 +196,13 @@ TEST(AssertionMacroDebugTest, TriggersAssertWhenConditionIsFalse)
 
 TEST(AssertionConstexprDebugTest, DoesNotTriggerAssertWhenTrue)
 {
-    ROAH_ASSERTION_C(true);
+    ROAH_ASSERT_C(true);
     SUCCEED();
 }
 
 TEST(AssertionConstexprDebugTest, TriggersAssertWhenFalse)
 {
-    EXPECT_DEATH(ROAH_ASSERTION_C(false), "");
+    EXPECT_DEATH(ROAH_ASSERT_C(false), "");
 }
 
 TEST(NotImplementedDebugTest, TriggersAssert)
