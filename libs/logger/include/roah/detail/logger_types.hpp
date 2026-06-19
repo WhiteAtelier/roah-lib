@@ -61,7 +61,7 @@ struct LoggerLogFileInitializeArgs
 
     /// @brief ログファイル名.
     ///
-    /// デフォルトでは, "{appname}_{datetime}_{pid}.log"
+    /// デフォルトでは, "{appname}_{datetime:yyyymmdd-HHMMSS}_{pid}.log"
     std::string file_name;
 };
 

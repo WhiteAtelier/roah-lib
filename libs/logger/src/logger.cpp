@@ -63,13 +63,13 @@ private:
     std::shared_ptr<spdlog::logger> logger_;
 
     static std::mutex &
-    _getMutex();
+    _getMutex() noexcept;
 
     static std::unordered_map<std::string, std::shared_ptr<Impl_>> &
-    _getLoggers();
+    _getLoggers() noexcept;
 
     static std::vector<std::weak_ptr<spdlog::sinks::sink>> &
-    _getSinks();
+    _getSinks() noexcept;
 };
 
 }  // namespace roah
@@ -82,7 +82,7 @@ static roah::LogLevel _initial_level;
 struct Converter_
 {
     spdlog::source_loc
-    operator()(const std::source_location & source_location) const
+    operator()(const std::source_location & source_location) const noexcept
     {
         return spdlog::source_loc{ source_location.file_name(),
                                    static_cast<int>(source_location.line()),
@@ -90,7 +90,7 @@ struct Converter_
     }
 
     spdlog::level::level_enum
-    operator()(const roah::LogLevel lvl) const
+    operator()(const roah::LogLevel lvl) const noexcept
     {
         switch (lvl)
         {
@@ -111,21 +111,21 @@ static const Converter_ _converter;
 }  // namespace
 
 std::mutex &
-roah::Logger::Impl_::_getMutex()
+roah::Logger::Impl_::_getMutex() noexcept
 {
     static std::mutex mutex;
     return mutex;
 }
 
 std::unordered_map<std::string, std::shared_ptr<roah::Logger::Impl_>> &
-roah::Logger::Impl_::_getLoggers()
+roah::Logger::Impl_::_getLoggers() noexcept
 {
     static std::unordered_map<std::string, std::shared_ptr<Impl_>> loggers;
     return loggers;
 }
 
 std::vector<std::weak_ptr<spdlog::sinks::sink>> &
-roah::Logger::Impl_::_getSinks()
+roah::Logger::Impl_::_getSinks() noexcept
 {
     static std::vector<std::weak_ptr<spdlog::sinks::sink>> sinks;
     return sinks;
@@ -152,7 +152,7 @@ roah::Logger::Logger(std::string name)
     : impl_{ Impl_::getOrCreateImpl(std::move(name)) }
 {}
 
-roah::Logger::Logger(const Logger &) {}
+roah::Logger::Logger(const Logger &) = default;
 
 roah::Logger::Logger(Logger &&) noexcept = default;
 
@@ -348,10 +348,11 @@ roah::Logger::Impl_::initialize(const std::string_view application_name, const L
         if (file_name.empty())
         {
             const auto pid = getCurrentProcessID();
-            file_name      = std::format("{}_{}_{}.log",  //
-                                    application_name,
-                                    std::chrono::system_clock::now(),
-                                    pid.toHexString());
+            file_name
+                = std::format("{}_{:%Y%m%d-%H%M%S}_{}.log",  //
+                              application_name,
+                              std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::system_clock::now()),
+                              pid.toHexString());
         }
 
         const auto & s_file = sinks.emplace_back(
@@ -443,8 +444,21 @@ roah::getLogLevelFromString(const std::string_view level_str)
     }
 }
 
+roah::LogLevel
+roah::getLogLevelFromString(const std::string_view level_str, const LogLevel default_level) noexcept
+{
+    try
+    {
+        return getLogLevelFromString(level_str);
+    }
+    catch (const std::invalid_argument &)
+    {
+        return default_level;
+    }
+}
+
 std::string_view
-roah::getLogLevelString(const LogLevel log_level)
+roah::getLogLevelString(const LogLevel log_level) noexcept
 {
     switch (log_level)
     {
