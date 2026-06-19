@@ -36,6 +36,7 @@ add_compile_definitions(
 
 option(BUILD_ROAH_ASSERT "Build libroah::roah-assert" ON)
 option(BUILD_ROAH_SUBPROCESS "Build libroah::roah-subprocess" ON)
+option(BUILD_ROAH_ENV "Build libroah::roah-env" ON)
 option(BUILD_ROAH_LOGGER "Build libroah::roah-logger" ON)
 option(BUILD_ROAH_CONFIG "Build libroah::roah-config" ON)
 option(BUILD_ROAH_STRING "Build libroah::roah-string" ON)
@@ -51,6 +52,10 @@ if (BUILD_ROAH_ASSERT)
 endif()
 
 if (BUILD_ROAH_SUBPROCESS)
+    # No dependencies for now
+endif()
+
+if (BUILD_ROAH_ENV)
     # No dependencies for now
 endif()
 
