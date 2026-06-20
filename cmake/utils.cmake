@@ -102,12 +102,15 @@ function(roah_add_library ARG_TARGET_NAME)
     add_library(${ARG_TARGET_NAME} STATIC)
     add_library(${PROJECT_NAME}::${ARG_TARGET_NAME} ALIAS ${ARG_TARGET_NAME})
 
+    set_target_properties(${ARG_TARGET_NAME}
+        PROPERTIES
+            CXX_STANDARD 20
+            CXX_STANDARD_REQUIRED ON
+            CXX_EXTENSIONS OFF
+    )
     if (LIBROAH_IS_MASTER_PROJECT)
         set_target_properties(${ARG_TARGET_NAME}
             PROPERTIES
-                CXX_STANDARD 20
-                CXX_STANDARD_REQUIRED ON
-                CXX_EXTENSIONS OFF
                 FOLDER "${TARGET_FOLDER}"
         )
     endif()
@@ -243,14 +246,17 @@ function(roah_add_library ARG_TARGET_NAME)
         # --- Add executable ---
         add_executable(${ARG_TARGET_NAME}-test)
 
+        set_target_properties(${ARG_TARGET_NAME}-test
+            PROPERTIES
+                CXX_STANDARD 20
+                CXX_STANDARD_REQUIRED ON
+                CXX_EXTENSIONS OFF
+                VS_DEBUGGER_ENVIRONMENT "GTEST_CATCH_EXCEPTIONS=0"
+        )
         if (LIBROAH_IS_MASTER_PROJECT)
             set_target_properties(${ARG_TARGET_NAME}-test
                 PROPERTIES
-                    CXX_STANDARD 20
-                    CXX_STANDARD_REQUIRED ON
-                    CXX_EXTENSIONS OFF
                     FOLDER "${TEST_TARGET_FOLDER}"
-                    VS_DEBUGGER_ENVIRONMENT "GTEST_CATCH_EXCEPTIONS=0"
             )
         endif()
 
@@ -420,12 +426,15 @@ function(roah_add_executable ARG_TARGET_NAME)
 
     add_executable(${ARG_TARGET_NAME})
 
+    set_target_properties(${ARG_TARGET_NAME}
+        PROPERTIES
+            CXX_STANDARD 20
+            CXX_STANDARD_REQUIRED ON
+            CXX_EXTENSIONS OFF
+    )
     if (LIBROAH_IS_MASTER_PROJECT)
         set_target_properties(${ARG_TARGET_NAME}
             PROPERTIES
-                CXX_STANDARD 20
-                CXX_STANDARD_REQUIRED ON
-                CXX_EXTENSIONS OFF
                 FOLDER "${TARGET_FOLDER}"
         )
     endif()
@@ -525,14 +534,17 @@ function(roah_add_executable ARG_TARGET_NAME)
 
         add_executable(${ARG_TARGET_NAME}-test)
 
+        set_target_properties(${ARG_TARGET_NAME}-test
+            PROPERTIES
+                CXX_STANDARD 20
+                CXX_STANDARD_REQUIRED ON
+                CXX_EXTENSIONS OFF
+                VS_DEBUGGER_ENVIRONMENT "GTEST_CATCH_EXCEPTIONS=0"
+        )
         if (LIBROAH_IS_MASTER_PROJECT)
             set_target_properties(${ARG_TARGET_NAME}-test
                 PROPERTIES
-                    CXX_STANDARD 20
-                    CXX_STANDARD_REQUIRED ON
-                    CXX_EXTENSIONS OFF
                     FOLDER "${TEST_TARGET_FOLDER}"
-                    VS_DEBUGGER_ENVIRONMENT "GTEST_CATCH_EXCEPTIONS=0"
             )
         endif()
 
