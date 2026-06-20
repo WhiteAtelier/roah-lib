@@ -13,18 +13,20 @@ project(libroah
         CXX
 )
 
+set(LIBROAH_IS_MASTER_PROJECT "${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME}")
+
 option(LIBROAH_BUILD_TESTS "Build test project."  OFF)
 option(LIBROAH_BUILD_DOCS  "Build documentation." OFF)
-option(LIBROAH_INSTALL     "Install libroah"      "${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME}")
+option(LIBROAH_INSTALL     "Install libroah"      LIBROAH_IS_MASTER_PROJECT)
 
-option(LIBROAH_BUILD_ASSERT "Build libroah::roah-assert" ON)
-option(LIBROAH_BUILD_SUBPROCESS "Build libroah::roah-subprocess" ON)
-option(LIBROAH_BUILD_ENV "Build libroah::roah-env" ON)
-option(LIBROAH_BUILD_LOGGER "Build libroah::roah-logger" ON)
-option(LIBROAH_BUILD_CONFIG "Build libroah::roah-config" ON)
-option(LIBROAH_BUILD_STRING "Build libroah::roah-string" ON)
-option(LIBROAH_BUILD_URL_PARSER "Build libroah::roah-url-parser" ON)
-option(LIBROAH_BUILD_LOGGER_WEB_VIEWER_APP "Build logging-web-viewer app" ON)
+option(LIBROAH_BUILD_ASSERT                "Build libroah::roah-assert"     ON)
+option(LIBROAH_BUILD_SUBPROCESS            "Build libroah::roah-subprocess" ON)
+option(LIBROAH_BUILD_ENV                   "Build libroah::roah-env"        ON)
+option(LIBROAH_BUILD_LOGGER                "Build libroah::roah-logger"     ON)
+option(LIBROAH_BUILD_CONFIG                "Build libroah::roah-config"     ON)
+option(LIBROAH_BUILD_STRING                "Build libroah::roah-string"     ON)
+option(LIBROAH_BUILD_URL_PARSER            "Build libroah::roah-url-parser" ON)
+option(LIBROAH_BUILD_LOGGER_WEB_VIEWER_APP "Build logging-web-viewer app"   ON)
 
 # Logger: Enable WebV sink
 option(LIBROAH_ENABLE_LOGGER_WEBV_SINK "Enable WebV sink in roah-logger library" ON)
