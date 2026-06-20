@@ -67,7 +67,7 @@ struct LoggerLogFileInitializeArgs
 
 /// @brief LoggingWebView アプリ向けの初期化設定.
 ///
-/// この機能を利用するには, ROAH_LOGGER_ENABLE_WEBV_SINK を有効にしてビルドする必要があります.
+/// この機能を利用するには, LIBROAH_ENABLE_LOGGER_WEBV_SINK を有効にしてビルドする必要があります.
 /// 有効になっていない環境では無視されます.
 struct LoggerWebvInitializeArgs
 {

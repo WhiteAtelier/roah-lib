@@ -16,13 +16,13 @@ roah_add_library(roah-assert
         $<$<CONFIG:Debug>:ROAH_ASSERT_ENABLE>
 
     COMPILE_DEFINITIONS
-        $<$<BOOL:${BUILD_ROAH_ASSERT}>:ROAH_ASSERT_LOGGER_ENABLE>
+        $<$<BOOL:${LIBROAH_BUILD_ASSERT}>:ROAH_ASSERT_LOGGER_ENABLE>
 
     MSVC_HEADERS_FILTER_ROOT
         roah
 )
 
-if (BUILD_ROAH_ASSERT)
+if (LIBROAH_BUILD_ASSERT)
     target_link_libraries(roah-assert
         PRIVATE
             roah-logger

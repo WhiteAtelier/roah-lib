@@ -1,8 +1,6 @@
 
-option(BUILD_DOCS "Generate documents." OFF)
-
 function(regist_doxygen_files ARG_FILES)
-    if (NOT ${BUILD_DOCS})
+    if (NOT ${LIBROAH_BUILD_DOCS})
         return()
     endif()
 
@@ -11,7 +9,7 @@ function(regist_doxygen_files ARG_FILES)
 endfunction()
 
 function(add_doxygen_target)
-    if (NOT ${BUILD_DOCS})
+    if (NOT ${LIBROAH_BUILD_DOCS})
         return()
     endif()
 
@@ -42,7 +40,7 @@ function(add_doxygen_target)
             ${CMAKE_COMMAND}
                 -D "DOXYGEN_TEMPLATE=${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Doxyfile.in"
                 -D "DOXYGEN_DOXYFILE=${DOXYFILE_OUTPUT_DIRECTORY}/Doxyfile"
-                -D "DOXYGEN_PROJECT_NAME=${CMAKE_PROJECT_NAME}"
+                -D "DOXYGEN_PROJECT_NAME=${PROJECT_NAME}"
                 -D "DOXYGEN_PROJECT_DESC=${CMAKE_PROJECT_DESCRIPTION}"
                 -D "DOXYGEN_PROJECT_VERSION=${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}.${CMAKE_PROJECT_VERSION_PATCH}"
                 -D "DOXYGEN_INPUT_SOURCES=${ROAH_DOXYGEN_HEADER_FILES_S}"

@@ -4,7 +4,7 @@
 
 #include "roah/logger.hpp"
 
-#ifdef ROAH_LOGGER_ENABLE_WEBV_SINK
+#ifdef LIBROAH_ENABLE_LOGGER_WEBV_SINK
 #    include "impl/webv_sink.hpp"
 #endif
 
@@ -362,7 +362,7 @@ roah::Logger::Impl_::initialize(const std::string_view application_name, const L
         lower_fn(args.log_file.level);
     }
 
-#ifdef ROAH_LOGGER_ENABLE_WEBV_SINK
+#ifdef LIBROAH_ENABLE_LOGGER_WEBV_SINK
     if (args.webv.level != LogLevel::Off)
     {
         const auto & s_webv = sinks.emplace_back(std::make_shared<logger::impl::WebVSinkMt>(  //

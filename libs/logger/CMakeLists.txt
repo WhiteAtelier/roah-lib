@@ -17,7 +17,7 @@ roah_add_library(roah-logger
         roah
 )
 
-if (ROAH_LOGGER_ENABLE_WEBV_SINK)
+if (LIBROAH_ENABLE_LOGGER_WEBV_SINK)
     find_package(nlohmann_json REQUIRED)
     target_sources(roah-logger
         PRIVATE
@@ -26,7 +26,7 @@ if (ROAH_LOGGER_ENABLE_WEBV_SINK)
     )
     target_compile_definitions(roah-logger
         PRIVATE
-            ROAH_LOGGER_ENABLE_WEBV_SINK
+            LIBROAH_ENABLE_LOGGER_WEBV_SINK
     )
     target_link_libraries(roah-logger
         PRIVATE

@@ -2,6 +2,6 @@
 # This software is released under the MIT License.
 # See the LICENSE file in the project root for more details.
 
-if (BUILD_APP_ROAH_LOGGING_WEB_VIEWER)
+if (LIBROAH_BUILD_LOGGER_WEB_VIEWER_APP)
     add_subdirectory(logging-web-viewer)
 endif()

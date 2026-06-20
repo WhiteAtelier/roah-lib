@@ -2,30 +2,30 @@
 # This software is released under the MIT License.
 # See the LICENSE file in the project root for more details.
 
-if (BUILD_ROAH_ASSERT)
+if (LIBROAH_BUILD_ASSERT)
     add_subdirectory(assert)
 endif()
 
-if (BUILD_ROAH_SUBPROCESS)
+if (LIBROAH_BUILD_SUBPROCESS)
     add_subdirectory(subprocess)
 endif()
 
-if (BUILD_ROAH_ENV)
+if (LIBROAH_BUILD_ENV)
     add_subdirectory(env)
 endif()
 
-if (BUILD_ROAH_LOGGER)
+if (LIBROAH_BUILD_LOGGER)
     add_subdirectory(logger)
 endif()
 
-if (BUILD_ROAH_CONFIG)
+if (LIBROAH_BUILD_CONFIG)
     add_subdirectory(config)
 endif()
 
-if (BUILD_ROAH_STRING)
+if (LIBROAH_BUILD_STRING)
     add_subdirectory(string)
 endif()
 
-if (BUILD_ROAH_URL_PARSER)
+if (LIBROAH_BUILD_URL_PARSER)
     add_subdirectory(url-parser)
 endif()
