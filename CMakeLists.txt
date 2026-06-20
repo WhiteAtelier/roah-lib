@@ -13,6 +13,22 @@ project(libroah
         CXX
 )
 
+option(LIBROAH_BUILD_TESTS "Build test project."  OFF)
+option(LIBROAH_BUILD_DOCS  "Build documentation." OFF)
+option(LIBROAH_INSTALL     "Install libroah"      "${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME}")
+
+option(LIBROAH_BUILD_ASSERT "Build libroah::roah-assert" ON)
+option(LIBROAH_BUILD_SUBPROCESS "Build libroah::roah-subprocess" ON)
+option(LIBROAH_BUILD_ENV "Build libroah::roah-env" ON)
+option(LIBROAH_BUILD_LOGGER "Build libroah::roah-logger" ON)
+option(LIBROAH_BUILD_CONFIG "Build libroah::roah-config" ON)
+option(LIBROAH_BUILD_STRING "Build libroah::roah-string" ON)
+option(LIBROAH_BUILD_URL_PARSER "Build libroah::roah-url-parser" ON)
+option(LIBROAH_BUILD_WEB_VIEWER_APP "Build logging-web-viewer app" ON)
+
+# Logger: Enable WebV sink
+option(ROAH_LOGGER_ENABLE_WEBV_SINK "Enable WebV sink in roah-logger library" ON)
+
 include(cmake/doxygen/doxygen.cmake)
 include(cmake/utils.cmake)
 
@@ -34,34 +50,32 @@ add_compile_definitions(
     "$<$<CXX_COMPILER_ID:MSVC>:WIN32_LEAN_AND_MEAN>"
 )
 
-option(BUILD_ROAH_ASSERT "Build libroah::roah-assert" ON)
-option(BUILD_ROAH_SUBPROCESS "Build libroah::roah-subprocess" ON)
-option(BUILD_ROAH_ENV "Build libroah::roah-env" ON)
-option(BUILD_ROAH_LOGGER "Build libroah::roah-logger" ON)
-option(BUILD_ROAH_CONFIG "Build libroah::roah-config" ON)
-option(BUILD_ROAH_STRING "Build libroah::roah-string" ON)
-option(BUILD_ROAH_URL_PARSER "Build libroah::roah-url-parser" ON)
-option(BUILD_APP_ROAH_LOGGING_WEB_VIEWER "Build logging-web-viewer app" ON)
-
-# Logger: Enable WebV sink
-option(ROAH_LOGGER_ENABLE_WEBV_SINK "Enable WebV sink in roah-logger library" ON)
-
 # --- Dependencies ---
-if (BUILD_ROAH_ASSERT)
+if (LIBROAH_BUILD_TESTS)
+    enable_testing()
+    find_package(GTest REQUIRED)
+    include(GoogleTest)
+endif()
+
+if (LIBROAH_BUILD_DOCS)
+    find_package(Doxygen REQUIRED)
+endif()
+
+if (LIBROAH_BUILD_ASSERT)
     # No dependencies for now
 endif()
 
-if (BUILD_ROAH_SUBPROCESS)
+if (LIBROAH_BUILD_SUBPROCESS)
     # No dependencies for now
 endif()
 
-if (BUILD_ROAH_ENV)
+if (LIBROAH_BUILD_ENV)
     # No dependencies for now
 endif()
 
-if (BUILD_ROAH_LOGGER)
-    if (NOT BUILD_ROAH_SUBPROCESS)
-        message(FATAL_ERROR "roah-logger library requires roah-subprocess library. Please enable BUILD_ROAH_SUBPROCESS option.")
+if (LIBROAH_BUILD_LOGGER)
+    if (NOT LIBROAH_BUILD_SUBPROCESS)
+        message(FATAL_ERROR "roah-logger library requires roah-subprocess library. Please enable LIBROAH_BUILD_SUBPROCESS option.")
     endif()
 
     find_package(spdlog 1 REQUIRED)
@@ -72,35 +86,35 @@ if (BUILD_ROAH_LOGGER)
     endif()
 endif()
 
-if (BUILD_ROAH_CONFIG)
+if (LIBROAH_BUILD_CONFIG)
     find_package(toml11 REQUIRED)
 endif()
 
-if (BUILD_ROAH_STRING)
+if (LIBROAH_BUILD_STRING)
     # No dependencies for now
 endif()
 
-if (BUILD_ROAH_URL_PARSER)
+if (LIBROAH_BUILD_URL_PARSER)
     # No dependencies for now
 endif()
 
-if (BUILD_APP_ROAH_LOGGING_WEB_VIEWER)
+if (LIBROAH_BUILD_WEB_VIEWER_APP)
     # Require roah libraries...
     # - roah-assert
     # - roah-url-parser
     # - roah-logger
     # - roah-config
-    if (NOT BUILD_ROAH_ASSERT)
-        message(FATAL_ERROR "logging-web-viewer app requires roah-assert library. Please enable BUILD_ROAH_ASSERT option.")
+    if (NOT LIBROAH_BUILD_ASSERT)
+        message(FATAL_ERROR "logging-web-viewer app requires roah-assert library. Please enable LIBROAH_BUILD_ASSERT option.")
     endif()
-    if (NOT BUILD_ROAH_URL_PARSER)
-        message(FATAL_ERROR "logging-web-viewer app requires roah-url-parser library. Please enable BUILD_ROAH_URL_PARSER option.")
+    if (NOT LIBROAH_BUILD_URL_PARSER)
+        message(FATAL_ERROR "logging-web-viewer app requires roah-url-parser library. Please enable LIBROAH_BUILD_URL_PARSER option.")
     endif()
-    if (NOT BUILD_ROAH_LOGGER)
-        message(FATAL_ERROR "logging-web-viewer app requires roah-logger library. Please enable BUILD_ROAH_LOGGER option.")
+    if (NOT LIBROAH_BUILD_LOGGER)
+        message(FATAL_ERROR "logging-web-viewer app requires roah-logger library. Please enable LIBROAH_BUILD_LOGGER option.")
     endif()
-    if (NOT BUILD_ROAH_CONFIG)
-        message(FATAL_ERROR "logging-web-viewer app requires roah-config library. Please enable BUILD_ROAH_CONFIG option.")
+    if (NOT LIBROAH_BUILD_CONFIG)
+        message(FATAL_ERROR "logging-web-viewer app requires roah-config library. Please enable LIBROAH_BUILD_CONFIG option.")
     endif()
 
     find_program(NPM_EXECUTABLE npm REQUIRED)

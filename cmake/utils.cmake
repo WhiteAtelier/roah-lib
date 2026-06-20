@@ -2,15 +2,6 @@
 # This software is released under the MIT License.
 # See the LICENSE file in the project root for more details.
 
-option(BUILD_TESTS "Build test project." OFF)
-option(LIBROAH_INSTALL "Install libroah" "${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME}")
-
-if (BUILD_TESTS)
-    enable_testing()
-    find_package(GTest REQUIRED)
-    include(GoogleTest)
-endif()
-
 # =============================================================================================== #
 #
 # roah_add_library
@@ -230,7 +221,8 @@ function(roah_add_library ARG_TARGET_NAME)
     # ========================================= #
     # test
     # ========================================= #
-    if (BUILD_TESTS AND (DEFINED ARG_TESTS))
+    if (LIBROAH_BUILD_TESTS AND (DEFINED ARG_TESTS))
+        find_package(GTest REQUIRED)
 
         # --- TESTS の一覧を絶対パスに変換 ---
         if (DEFINED ARG_TESTS)
@@ -507,7 +499,7 @@ function(roah_add_executable ARG_TARGET_NAME)
     # =======================================
     # test
     # =======================================
-    if (BUILD_TESTS AND (DEFINED ARG_TESTS))
+    if (LIBROAH_BUILD_TESTS AND (DEFINED ARG_TESTS))
 
         # ARG_TESTS を見て, test/ を付加する
         if (DEFINED ARG_TESTS)

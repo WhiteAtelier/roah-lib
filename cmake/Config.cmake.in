@@ -6,19 +6,19 @@
 
 include(CMakeFindDependencyMacro)
 
-if (@BUILD_ROAH_ASSERT@)
+if (@LIBROAH_BUILD_ASSERT@)
     add_compile_definitions(
         $<$<CONFIG:Debug>:ROAH_ASSERT_ENABLE=1>
     )
 endif()
 
-if (@BUILD_ROAH_SUBPROCESS@)
+if (@LIBROAH_BUILD_SUBPROCESS@)
 endif()
 
-if (@BUILD_ROAH_ENV@)
+if (@LIBROAH_BUILD_ENV@)
 endif()
 
-if (@BUILD_ROAH_LOGGER@)
+if (@LIBROAH_BUILD_LOGGER@)
     find_dependency(spdlog 1 REQUIRED)
 
     if (@ROAH_LOGGER_ENABLE_WEBV_SINK@)
@@ -27,14 +27,14 @@ if (@BUILD_ROAH_LOGGER@)
     endif()
 endif()
 
-if (@BUILD_ROAH_CONFIG@)
+if (@LIBROAH_BUILD_CONFIG@)
     find_dependency(toml11 REQUIRED)
 endif()
 
-if (@BUILD_ROAH_URL_PARSER@)
+if (@LIBROAH_BUILD_URL_PARSER@)
 endif()
 
-if (@BUILD_APP_ROAH_LOGGING_WEB_VIEWER@)
+if (@LIBROAH_BUILD_WEB_VIEWER_APP@)
     find_dependency(CLI11 REQUIRED)
     find_dependency(ixwebsocket REQUIRED)
     find_dependency(nlohmann_json REQUIRED)
