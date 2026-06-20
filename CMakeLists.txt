@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 
 project(libroah
     VERSION
-        1.10.0
+        1.10.1
     DESCRIPTION
         "Roah Common Libraries"
     LANGUAGES
@@ -21,7 +21,7 @@ endif()
 
 option(LIBROAH_BUILD_TESTS "Build test project."  OFF)
 option(LIBROAH_BUILD_DOCS  "Build documentation." OFF)
-option(LIBROAH_INSTALL     "Install libroah"      LIBROAH_IS_MASTER_PROJECT)
+option(LIBROAH_INSTALL     "Install libroah"      ${LIBROAH_IS_MASTER_PROJECT})
 
 option(LIBROAH_BUILD_ASSERT                "Build libroah::roah-assert"     ON)
 option(LIBROAH_BUILD_SUBPROCESS            "Build libroah::roah-subprocess" ON)
