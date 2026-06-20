@@ -13,7 +13,11 @@ project(libroah
         CXX
 )
 
-set(LIBROAH_IS_MASTER_PROJECT "${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME}")
+if ("${CMAKE_PROJECT_NAME}" STREQUAL "${PROJECT_NAME}")
+    set(LIBROAH_IS_MASTER_PROJECT ON)
+else()
+    set(LIBROAH_IS_MASTER_PROJECT OFF)
+endif()
 
 option(LIBROAH_BUILD_TESTS "Build test project."  OFF)
 option(LIBROAH_BUILD_DOCS  "Build documentation." OFF)
