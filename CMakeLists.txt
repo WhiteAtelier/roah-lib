@@ -24,10 +24,10 @@ option(LIBROAH_BUILD_LOGGER "Build libroah::roah-logger" ON)
 option(LIBROAH_BUILD_CONFIG "Build libroah::roah-config" ON)
 option(LIBROAH_BUILD_STRING "Build libroah::roah-string" ON)
 option(LIBROAH_BUILD_URL_PARSER "Build libroah::roah-url-parser" ON)
-option(LIBROAH_BUILD_WEB_VIEWER_APP "Build logging-web-viewer app" ON)
+option(LIBROAH_BUILD_LOGGER_WEB_VIEWER_APP "Build logging-web-viewer app" ON)
 
 # Logger: Enable WebV sink
-option(ROAH_LOGGER_ENABLE_WEBV_SINK "Enable WebV sink in roah-logger library" ON)
+option(LIBROAH_ENABLE_LOGGER_WEBV_SINK "Enable WebV sink in roah-logger library" ON)
 
 include(cmake/doxygen/doxygen.cmake)
 include(cmake/utils.cmake)
@@ -80,7 +80,7 @@ if (LIBROAH_BUILD_LOGGER)
 
     find_package(spdlog 1 REQUIRED)
 
-    if (ROAH_LOGGER_ENABLE_WEBV_SINK)
+    if (LIBROAH_ENABLE_LOGGER_WEBV_SINK)
         find_package(ixwebsocket REQUIRED)
         find_package(nlohmann_json REQUIRED)
     endif()
@@ -98,7 +98,7 @@ if (LIBROAH_BUILD_URL_PARSER)
     # No dependencies for now
 endif()
 
-if (LIBROAH_BUILD_WEB_VIEWER_APP)
+if (LIBROAH_BUILD_LOGGER_WEB_VIEWER_APP)
     # Require roah libraries...
     # - roah-assert
     # - roah-url-parser
