@@ -3,6 +3,7 @@
 # See the LICENSE file in the project root for more details.
 
 option(BUILD_TESTS "Build test project." OFF)
+option(LIBROAH_INSTALL "Install libroah" "${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME}")
 
 if (BUILD_TESTS)
     enable_testing()
@@ -218,11 +219,13 @@ function(roah_add_library ARG_TARGET_NAME)
         endif()
     endif()
 
-    install(
-        TARGETS ${ARG_TARGET_NAME}
-        EXPORT ${PROJECT_NAME}-export
-        FILE_SET HEADERS
-    )
+    if (LIBROAH_INSTALL)
+        install(
+            TARGETS ${ARG_TARGET_NAME}
+            EXPORT ${PROJECT_NAME}-export
+            FILE_SET HEADERS
+        )
+    endif()
 
     # ========================================= #
     # test
@@ -493,11 +496,13 @@ function(roah_add_executable ARG_TARGET_NAME)
                 "${CMAKE_CURRENT_BINARY_DIR}")
     endif()
 
-    install(
-        TARGETS
-            ${ARG_TARGET_NAME}
-        RUNTIME
-    )
+    if (LIBROAH_INSTALL)
+        install(
+            TARGETS
+                ${ARG_TARGET_NAME}
+            RUNTIME
+        )
+    endif()
 
     # =======================================
     # test
@@ -605,6 +610,10 @@ function(roah_add_executable ARG_TARGET_NAME)
 endfunction()
 
 function(export_config)
+    if (NOT LIBROAH_INSTALL)
+        return()
+    endif()
+
     install (
         EXPORT
             ${PROJECT_NAME}-export
