@@ -108,7 +108,7 @@ function(roah_add_library ARG_TARGET_NAME)
 
     # --- Add library ---
     add_library(${ARG_TARGET_NAME} STATIC)
-    add_library(${CMAKE_PROJECT_NAME}::${ARG_TARGET_NAME} ALIAS ${ARG_TARGET_NAME})
+    add_library(${PROJECT_NAME}::${ARG_TARGET_NAME} ALIAS ${ARG_TARGET_NAME})
 
     set_target_properties(${ARG_TARGET_NAME}
         PROPERTIES
