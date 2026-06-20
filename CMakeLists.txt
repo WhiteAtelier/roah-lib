@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 
 project(libroah
     VERSION
-        1.9.2
+        1.10.0
     DESCRIPTION
         "Roah Common Libraries"
     LANGUAGES
