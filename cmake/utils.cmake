@@ -612,7 +612,7 @@ function(export_config)
             lib/cmake/${CMAKE_PROJECT_NAME}
         NAMESPACE
             ${CMAKE_PROJECT_NAME}::
-        EXPORT_LINK_INTERFACE_LIBRARIES
+        # EXPORT_LINK_INTERFACE_LIBRARIES
     )
 
     include(CMakePackageConfigHelpers)
