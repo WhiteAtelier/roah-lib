@@ -119,7 +119,7 @@ install(
     FILES
         "${CMAKE_SOURCE_DIR}/LICENSE"
     DESTINATION
-        "lib/cmake/${CMAKE_PROJECT_NAME}"
+        "lib/cmake/${PROJECT_NAME}"
     RENAME
         "libroah-LICENSE"
 )
