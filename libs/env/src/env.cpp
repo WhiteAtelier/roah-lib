@@ -23,16 +23,16 @@ roah::getEnv(const std::string & name, std::string default_value)
 }
 
 bool
-roah::getEnvSwitch(const std::string & name)
+roah::getEnvSwitch(const std::string & name, const bool default_value)
 {
     auto val = getEnv(name);
     if (val.empty())
     {
-        return false;
+        return default_value;
     }
     // 大文字小文字を区別せずに比較するため, 小文字に変換する.
     std::ranges::transform(val, val.begin(), [](const unsigned char c) { return static_cast<char>(std::tolower(c)); });
-    return val == "1" || val == "true" || val == "yes";
+    return val == "1" || val == "true" || val == "yes" || val == "on";
 }
 
 std::string
