@@ -20,13 +20,16 @@ getEnv(const std::string & name, std::string default_value = "");
 
 /// @brief 指定した環境変数について, true 値が設定されているかを取得する.
 ///
-/// true 値とみなすのは, "1", "true", "yes" (大文字小文字は区別しない) です.
+/// true 値とみなすのは, "1", "true", "yes", "on" (大文字小文字は区別しない) です.
 /// これ以外の値では false と見なします.
 ///
 /// @param name
 ///     環境変数の名前.
+///
+/// @param default_value
+///     デフォルトの値. 環境変数が存在しないか, 空文字列の場合に返される値.
 bool
-getEnvSwitch(const std::string & name);
+getEnvSwitch(const std::string & name, const bool default_value = false);
 
 /// @brief 環境変数を展開する.
 ///
