@@ -9,8 +9,7 @@
 #include "roah/logger.hpp"
 
 #include <CLI/CLI.hpp>
-
-#include <IXNetSystem.h>
+#include <ixwebsocket/IXNetSystem.h>
 
 #include <iostream>
 #include <optional>

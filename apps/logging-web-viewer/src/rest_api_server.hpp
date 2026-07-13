@@ -5,7 +5,7 @@
 #ifndef ROAH_LOGGING_WEB_VIEWER_REST_API_SERVER_HPP
 #define ROAH_LOGGING_WEB_VIEWER_REST_API_SERVER_HPP
 
-#include <IXHttpServer.h>
+#include <ixwebsocket/IXHttpServer.h>
 
 namespace roah::logging::webv {
 

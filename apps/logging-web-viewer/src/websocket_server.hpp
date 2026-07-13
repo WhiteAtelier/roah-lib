@@ -5,7 +5,7 @@
 #ifndef ROAH_LOGGING_WEB_VIEWER_WEBSOCKET_SERVER_HPP
 #define ROAH_LOGGING_WEB_VIEWER_WEBSOCKET_SERVER_HPP
 
-#include <IXWebSocketServer.h>
+#include <ixwebsocket/IXWebSocketServer.h>
 
 #include <memory>
 #include <vector>

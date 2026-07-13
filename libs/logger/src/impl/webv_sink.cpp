@@ -4,7 +4,7 @@
 
 #include "webv_sink.hpp"
 
-#include <IXNetSystem.h>
+#include <ixwebsocket/IXNetSystem.h>
 
 #include <format>
 #include <iostream>
