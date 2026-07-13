@@ -8,9 +8,8 @@
 #include "spdlog/details/null_mutex.h"
 #include "spdlog/sinks/base_sink.h"
 
+#include <ixwebsocket/IXWebSocket.h>
 #include <nlohmann/json.hpp>
-
-#include <IXWebSocket.h>
 
 #include <mutex>
 #include <string>

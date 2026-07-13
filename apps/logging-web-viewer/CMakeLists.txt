@@ -31,7 +31,7 @@ add_custom_command(
     COMMAND
         ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/dist
     COMMAND
-        ${NPM_EXECUTABLE} run build -- --outDir ${CMAKE_CURRENT_BINARY_DIR}/dist
+        ${NPM_EXECUTABLE} run build -- --outDir ${CMAKE_CURRENT_BINARY_DIR}/dist --emptyOutDir
 
     WORKING_DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}/http/webv
