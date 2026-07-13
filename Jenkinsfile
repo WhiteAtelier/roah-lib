@@ -6,7 +6,7 @@ pipeline {
         TOML11_COMMIT           = 'be08ba2be2a964edcdb3d3e3ea8d100abc26f286'  // tag v4.4.0
         GOOGLETEST_COMMIT       = '52eb8108c5bdec04579160ae17225d66034bd723'  // tag v1.17.0
         CLI11_COMMIT            = '37bb6edc5317e99af72ef48405e65d9ca5218861'  // tag v2.6.2
-        IXWEBSOCKET_COMMIT      = '2efe037c9cc96fd536774f17bdb5215161ee5087'  // tag v11.4.6
+        IXWEBSOCKET_COMMIT      = '64fae7676bd8fe31f7cb4bcde7a6841892dad65e'  // tag v12.0.1
         NLOHMANN_JSON_COMMIT    = '55f93686c01528224f448c19128836e7df245f72'  // tag v3.12.0
         DEPS_PREFIX_PATH        = "${WORKSPACE}/deps/spdlog;" +
                                   "${WORKSPACE}/deps/toml11;" +
