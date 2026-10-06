@@ -196,12 +196,12 @@ pipeline {
         stage('Configure roah-lib (release)') {
             steps {
                 sh """
-                    cmake -G Ninja -B "${WORKSPACE}/build" -S "${WORKSPACE}" \
-                        -DCMAKE_BUILD_TYPE=Release \
-                        -DCMAKE_INSTALL_PREFIX="${WORKSPACE}/install" \
-                        -DCMAKE_PREFIX_PATH="${DEPS_PREFIX_PATH}" \
-                        -DLIBROAH_INSTALL=ON \
-                        -DLIBROAH_BUILD_DOCS=ON \
+                    cmake -G Ninja -B "${WORKSPACE}/build" -S "${WORKSPACE}" \\
+                        -DCMAKE_BUILD_TYPE=Release \\
+                        -DCMAKE_INSTALL_PREFIX="${WORKSPACE}/install" \\
+                        -DCMAKE_PREFIX_PATH="${DEPS_PREFIX_PATH}" \\
+                        -DLIBROAH_INSTALL=ON \\
+                        -DLIBROAH_BUILD_DOCS=ON \\
                         -DLIBROAH_BUILD_TESTS=ON
                 """
             }
@@ -233,12 +233,13 @@ pipeline {
         stage('Configure roah-lib (debug)') {
             steps {
                 sh """
-                    cmake -G Ninja -B "${WORKSPACE}/build_d" -S "${WORKSPACE}" \
-                        -DCMAKE_BUILD_TYPE=Debug \
-                        -DCMAKE_INSTALL_PREFIX="${WORKSPACE}/install_d" \
-                        -DCMAKE_PREFIX_PATH="${DEPS_PREFIX_PATH}" \
-                        -DBUILD_DOCS=1 \
-                        -DBUILD_TESTS=1
+                    cmake -G Ninja -B "${WORKSPACE}/build_d" -S "${WORKSPACE}" \\
+                        -DCMAKE_BUILD_TYPE=Debug \\
+                        -DCMAKE_INSTALL_PREFIX="${WORKSPACE}/install_d" \\
+                        -DCMAKE_PREFIX_PATH="${DEPS_PREFIX_PATH}" \\
+                        -DLIBROAH_INSTALL=ON \\
+                        -DLIBROAH_BUILD_DOCS=ON \\
+                        -DLIBROAH_BUILD_TESTS=ON
                 """
             }
         }
