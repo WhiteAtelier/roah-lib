@@ -1,13 +1,16 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'SPDLOG_COMMIT', defaultValue: '79524ddd08a4ec981b7fea76afd08ee05f83755d', description: 'spdlog のコミットハッシュ (tag 1.7.0)', trim: true)
+        string(name: 'TOML11_COMMIT', defaultValue: 'be08ba2be2a964edcdb3d3e3ea8d100abc26f286', description: 'toml11 のコミットハッシュ (tag v4.4.0)', trim: true)
+        string(name: 'GOOGLETEST_COMMIT', defaultValue: '52eb8108c5bdec04579160ae17225d66034bd723', description: 'googletest のコミットハッシュ (tag v1.17.0)', trim: true)
+        string(name: 'CLI11_COMMIT', defaultValue: '37bb6edc5317e99af72ef48405e65d9ca5218861', description: 'CLI11 のコミットハッシュ (tag v2.6.2)', trim: true)
+        string(name: 'IXWEBSOCKET_COMMIT', defaultValue: '64fae7676bd8fe31f7cb4bcde7a6841892dad65e', description: 'IXWebSocket のコミットハッシュ (tag v12.0.1)', trim: true)
+        string(name: 'NLOHMANN_JSON_COMMIT', defaultValue: '55f93686c01528224f448c19128836e7df245f72', description: 'nlohmann/json のコミットハッシュ (tag v3.12.0)', trim: true)
+    }
+
     environment {
-        SPDLOG_COMMIT           = '79524ddd08a4ec981b7fea76afd08ee05f83755d'  // tag 1.7.0
-        TOML11_COMMIT           = 'be08ba2be2a964edcdb3d3e3ea8d100abc26f286'  // tag v4.4.0
-        GOOGLETEST_COMMIT       = '52eb8108c5bdec04579160ae17225d66034bd723'  // tag v1.17.0
-        CLI11_COMMIT            = '37bb6edc5317e99af72ef48405e65d9ca5218861'  // tag v2.6.2
-        IXWEBSOCKET_COMMIT      = '64fae7676bd8fe31f7cb4bcde7a6841892dad65e'  // tag v12.0.1
-        NLOHMANN_JSON_COMMIT    = '55f93686c01528224f448c19128836e7df245f72'  // tag v3.12.0
         DEPS_PREFIX_PATH        = "${WORKSPACE}/deps/spdlog;" +
                                   "${WORKSPACE}/deps/toml11;" +
                                   "${WORKSPACE}/deps/googletest;" +
@@ -22,7 +25,7 @@ pipeline {
                 dir('deps/spdlog/.src') {
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: "${SPDLOG_COMMIT}"]],
+                        branches: [[name: "${params.SPDLOG_COMMIT}"]],
                         userRemoteConfigs: [[url: 'https://github.com/gabime/spdlog.git']]
                     ])
                 }
@@ -57,7 +60,7 @@ pipeline {
                 dir('deps/toml11/.src') {
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: "${TOML11_COMMIT}"]],
+                        branches: [[name: "${params.TOML11_COMMIT}"]],
                         userRemoteConfigs: [[url: 'https://github.com/ToruNiina/toml11.git']]
                     ])
                 }
@@ -81,7 +84,7 @@ pipeline {
                 dir('deps/googletest/.src') {
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: "${GOOGLETEST_COMMIT}"]],
+                        branches: [[name: "${params.GOOGLETEST_COMMIT}"]],
                         userRemoteConfigs: [[url: 'https://github.com/google/googletest.git']]
                     ])
                 }
@@ -109,7 +112,7 @@ pipeline {
                 dir('deps/cli11/.src') {
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: "${CLI11_COMMIT}"]],
+                        branches: [[name: "${params.CLI11_COMMIT}"]],
                         userRemoteConfigs: [[url: 'https://github.com/CLIUtils/CLI11.git']]
                     ])
                 }
@@ -139,7 +142,7 @@ pipeline {
                 dir('deps/ixwebsocket/.src') {
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: "${IXWEBSOCKET_COMMIT}"]],
+                        branches: [[name: "${params.IXWEBSOCKET_COMMIT}"]],
                         userRemoteConfigs: [[url: 'https://github.com/machinezone/IXWebSocket.git']]
                     ])
                 }
@@ -163,7 +166,7 @@ pipeline {
                 dir('deps/nlohmann-json/.src') {
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: "${NLOHMANN_JSON_COMMIT}"]],
+                        branches: [[name: "${params.NLOHMANN_JSON_COMMIT}"]],
                         userRemoteConfigs: [[url: 'https://github.com/nlohmann/json.git']]
                     ])
                 }
@@ -193,12 +196,13 @@ pipeline {
         stage('Configure roah-lib (release)') {
             steps {
                 sh """
-                    cmake -G Ninja -B "${WORKSPACE}/build" -S "${WORKSPACE}" \
-                        -DCMAKE_BUILD_TYPE=Release \
-                        -DCMAKE_INSTALL_PREFIX="${WORKSPACE}/install" \
-                        -DCMAKE_PREFIX_PATH="${DEPS_PREFIX_PATH}" \
-                        -DBUILD_DOCS=1 \
-                        -DBUILD_TESTS=1
+                    cmake -G Ninja -B "${WORKSPACE}/build" -S "${WORKSPACE}" \\
+                        -DCMAKE_BUILD_TYPE=Release \\
+                        -DCMAKE_INSTALL_PREFIX="${WORKSPACE}/install" \\
+                        -DCMAKE_PREFIX_PATH="${DEPS_PREFIX_PATH}" \\
+                        -DLIBROAH_INSTALL=ON \\
+                        -DLIBROAH_BUILD_DOCS=ON \\
+                        -DLIBROAH_BUILD_TESTS=ON
                 """
             }
         }
@@ -229,12 +233,13 @@ pipeline {
         stage('Configure roah-lib (debug)') {
             steps {
                 sh """
-                    cmake -G Ninja -B "${WORKSPACE}/build_d" -S "${WORKSPACE}" \
-                        -DCMAKE_BUILD_TYPE=Debug \
-                        -DCMAKE_INSTALL_PREFIX="${WORKSPACE}/install_d" \
-                        -DCMAKE_PREFIX_PATH="${DEPS_PREFIX_PATH}" \
-                        -DBUILD_DOCS=1 \
-                        -DBUILD_TESTS=1
+                    cmake -G Ninja -B "${WORKSPACE}/build_d" -S "${WORKSPACE}" \\
+                        -DCMAKE_BUILD_TYPE=Debug \\
+                        -DCMAKE_INSTALL_PREFIX="${WORKSPACE}/install_d" \\
+                        -DCMAKE_PREFIX_PATH="${DEPS_PREFIX_PATH}" \\
+                        -DLIBROAH_INSTALL=ON \\
+                        -DLIBROAH_BUILD_DOCS=ON \\
+                        -DLIBROAH_BUILD_TESTS=ON
                 """
             }
         }
