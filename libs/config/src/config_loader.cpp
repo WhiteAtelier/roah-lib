@@ -61,22 +61,18 @@ roah::ConfigLoader::Data_::get(const toml::value * const root, const std::string
     std::string key;
 
     for (auto end = path.find_first_of('.', beg); end != std::string_view::npos;
-         beg = end + 1, end = path.find_first_of('.', end - beg))
+         beg = end + 1, end = path.find_first_of('.', beg))
     {
         key = path.substr(beg, end - beg);
-        if (!ret->contains(key))
+        if (!(ret->is_table() && ret->contains(key)))
         {
             return nullptr;
         }
         ret = &ret->at(key);
-        if (!ret->is_table())
-        {
-            return nullptr;
-        }
     }
 
     key = path.substr(beg);
-    return ret->contains(key) ? &ret->at(key) : nullptr;
+    return (ret->is_table() && ret->contains(key)) ? &ret->at(key) : nullptr;
 }
 
 roah::ConfigLoader::ConfigLoader() noexcept = default;
