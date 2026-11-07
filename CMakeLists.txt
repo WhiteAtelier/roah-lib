@@ -143,3 +143,5 @@ install(
     RENAME
         "libroah-LICENSE"
 )
+
+include(cmake/cpack.cmake)
