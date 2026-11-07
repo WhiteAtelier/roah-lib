@@ -1,0 +1,174 @@
+// This file contains code generated with the assistance of Codex (OpenAI), an AI assistant.
+// The generated code is provided as-is.
+
+// agent の OS に応じてコマンドを実行し, 失敗時はパイプラインを停止します.
+def runCommand(String command) {
+    if (isUnix()) {
+        sh command
+    } else {
+        bat "@${command}"
+    }
+}
+
+pipeline {
+    agent none
+
+    stages {
+        stage('Build architectures') {
+            matrix {
+                axes {
+                    axis {
+                        name 'ARCHITECTURE'
+                        values 'arm64', 'x86_64'
+                    }
+                }
+                agent {
+                    label "cpp && ${ARCHITECTURE}"
+                }
+                environment {
+                    BUILD_DIR = "${WORKSPACE}/.jenkins-build/build"
+                    DEBUG_BUILD_DIR = "${WORKSPACE}/.jenkins-build/build_d"
+                    INSTALL_DIR = "${WORKSPACE}/.jenkins-build/install"
+                    DEBUG_INSTALL_DIR = "${WORKSPACE}/.jenkins-build/install_d"
+                    PACKAGE_DIR = "${WORKSPACE}/.jenkins-build/packages"
+                }
+
+                stages {
+                    stage('Prepare') {
+                        steps {
+                            // 前回のキャッシュ, テスト結果, パッケージを残さずに開始します.
+                            dir('.jenkins-build') {
+                                deleteDir()
+                            }
+                        }
+                    }
+
+                    stage('Dependencies') {
+                        steps {
+                            script {
+                                runCommand('distbuilder --export-presets "jenkins"')
+                            }
+                        }
+                    }
+
+                    stage('Debug') {
+                        when {
+                            expression {
+                                // Linux ではコンパイラの種類によらず Debug をスキップします.
+                                !isUnix() || sh(script: 'uname -s', returnStdout: true).trim() != 'Linux'
+                            }
+                        }
+                        stages {
+                            stage('Configure roah-lib (debug)') {
+                                steps {
+                                    script {
+                                        runCommand("cmake --preset default -S \"${env.WORKSPACE}\" -B \"${env.DEBUG_BUILD_DIR}\" " +
+                                            "--install-prefix \"${env.DEBUG_INSTALL_DIR}\" " +
+                                            '-DCMAKE_BUILD_TYPE=Debug ' +
+                                            '-DLIBROAH_INSTALL=ON -DLIBROAH_BUILD_DOCS=ON -DLIBROAH_BUILD_TESTS=ON')
+                                    }
+                                }
+                            }
+
+                            stage('Build roah-lib (debug)') {
+                                steps {
+                                    script {
+                                        runCommand("cmake --build \"${env.DEBUG_BUILD_DIR}\" --config Debug --parallel")
+                                    }
+                                }
+                            }
+
+                            stage('Install roah-lib (debug)') {
+                                steps {
+                                    script {
+                                        runCommand("cmake --install \"${env.DEBUG_BUILD_DIR}\" --config Debug")
+                                    }
+                                }
+                            }
+
+                            stage('Run tests (debug)') {
+                                steps {
+                                    script {
+                                        runCommand("ctest --test-dir \"${env.DEBUG_BUILD_DIR}\" -C Debug " +
+                                            '--output-on-failure --no-tests=error ' +
+                                            "--output-junit \"${env.DEBUG_BUILD_DIR}/test-results.xml\"")
+                                    }
+                                }
+                                post {
+                                    always {
+                                        script {
+                                            if (fileExists('.jenkins-build/build_d/test-results.xml')) {
+                                                junit testResults: '.jenkins-build/build_d/test-results.xml'
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    stage('Configure roah-lib (release)') {
+                        steps {
+                            script {
+                                runCommand("cmake --preset default -S \"${env.WORKSPACE}\" -B \"${env.BUILD_DIR}\" " +
+                                    "--install-prefix \"${env.INSTALL_DIR}\" " +
+                                    '-DCMAKE_BUILD_TYPE=Release ' +
+                                    '-DLIBROAH_INSTALL=ON -DLIBROAH_BUILD_DOCS=ON -DLIBROAH_BUILD_TESTS=ON')
+                            }
+                        }
+                    }
+
+                    stage('Build roah-lib (release)') {
+                        steps {
+                            script {
+                                runCommand("cmake --build \"${env.BUILD_DIR}\" --config Release --parallel")
+                            }
+                        }
+                    }
+
+                    stage('Install roah-lib (release)') {
+                        steps {
+                            script {
+                                runCommand("cmake --install \"${env.BUILD_DIR}\" --config Release")
+                            }
+                        }
+                    }
+
+                    stage('Run tests (release)') {
+                        steps {
+                            script {
+                                runCommand("ctest --test-dir \"${env.BUILD_DIR}\" -C Release " +
+                                    '--output-on-failure --no-tests=error ' +
+                                    "--output-junit \"${env.BUILD_DIR}/test-results.xml\"")
+                            }
+                        }
+                        post {
+                            always {
+                                script {
+                                    if (fileExists('.jenkins-build/build/test-results.xml')) {
+                                        junit testResults: '.jenkins-build/build/test-results.xml'
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    stage('Package') {
+                        steps {
+                            script {
+                                runCommand("cpack --config \"${env.BUILD_DIR}/CPackConfig.cmake\" " +
+                                    "-C Release -G TGZ -B \"${env.PACKAGE_DIR}\"")
+                            }
+                            archiveArtifacts(
+                                artifacts: '.jenkins-build/packages/libroah.*.tar.gz',
+                                fingerprint: true,
+                                onlyIfSuccessful: true,
+                                allowEmptyArchive: false
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

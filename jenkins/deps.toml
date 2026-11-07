@@ -1,0 +1,19 @@
+cxx_standard = "20"
+
+[gabime.spdlog]
+version = "1.17.0"
+
+[ToruNiina.toml11]
+version = "4.4.0"
+
+[google.googletest]
+version = "1.17.0"
+
+[machinezone.IXWebSocket]
+version = "12.0.1"
+
+[nlohmann.json]
+version = "3.12.0"
+
+[CLIUtils.CLI11]
+version = "2.6.2"
