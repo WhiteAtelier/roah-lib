@@ -1,0 +1,17 @@
+title = "root"
+
+[app.transport.http]
+host = "nested.example"
+port = 9443
+enabled = true
+rate = 0.25
+ports = [8080, 8443]
+"white space" = "preserved"
+" " = "space key"
+"\t" = "tab key"
+
+[" "]
+value = "space category"
+
+["\t"]
+value = "tab category"
