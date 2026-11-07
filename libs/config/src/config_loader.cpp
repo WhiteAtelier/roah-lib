@@ -27,6 +27,9 @@ public:
     const toml::value *
     get(const std::string_view category, const std::string_view key) const;
 
+    static const toml::value *
+    get(const toml::value * const root, const std::string_view path);
+
 private:
     toml::value data_;
 };
@@ -42,15 +45,34 @@ roah::ConfigLoader::Data_::~Data_() noexcept = default;
 const toml::value *
 roah::ConfigLoader::Data_::get(const std::string_view category, const std::string_view key) const
 {
-    if (std::string category_str{ category }; this->data_.contains(category_str))
+    return this->get(this->get(&this->data_, category), key);
+}
+
+const toml::value *
+roah::ConfigLoader::Data_::get(const toml::value * const root, const std::string_view path)
+{
+    if (root == nullptr || path.empty())
     {
-        const auto & c_value = this->data_.at(category_str);
-        if (std::string key_str{ key }; c_value.contains(key_str))
-        {
-            return &c_value.at(key_str);
-        }
+        return root;
     }
-    return nullptr;
+
+    auto        ret = root;
+    std::size_t beg = 0;
+    std::string key;
+
+    for (auto end = path.find_first_of('.', beg); end != std::string_view::npos;
+         beg = end + 1, end = path.find_first_of('.', beg))
+    {
+        key = path.substr(beg, end - beg);
+        if (!(ret->is_table() && ret->contains(key)))
+        {
+            return nullptr;
+        }
+        ret = &ret->at(key);
+    }
+
+    key = path.substr(beg);
+    return (ret->is_table() && ret->contains(key)) ? &ret->at(key) : nullptr;
 }
 
 roah::ConfigLoader::ConfigLoader() noexcept = default;

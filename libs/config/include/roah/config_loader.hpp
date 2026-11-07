@@ -20,6 +20,9 @@ namespace roah {
 /// このクラスが対応する Config ファイルは TOML 形式です.
 /// ファイルの拡張子などの指定はありません.
 ///
+/// なお, 値の取得時は category と key のどちらにも "." 区切りで階層を指定できます.
+/// category, key の順に階層を辿り, 空文字列を指定した引数はスキップします.
+///
 class ConfigLoader
 {
 public:

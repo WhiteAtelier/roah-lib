@@ -18,6 +18,7 @@ roah_add_library(roah-config
 
     TESTS
         main.cpp
+        path.cpp
 
     MSVC_HEADERS_FILTER_ROOT
         roah

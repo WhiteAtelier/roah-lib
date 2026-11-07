@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 
 project(libroah
     VERSION
-        1.11.0
+        1.12.0
     DESCRIPTION
         "Roah Common Libraries"
     LANGUAGES
@@ -143,3 +143,5 @@ install(
     RENAME
         "libroah-LICENSE"
 )
+
+include(cmake/cpack.cmake)
