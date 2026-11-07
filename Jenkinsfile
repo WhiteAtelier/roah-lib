@@ -19,13 +19,14 @@ pipeline {
                 axes {
                     axis {
                         name 'ARCHITECTURE'
-                        values 'arm64', 'amd64'
+                        values 'arm64', 'x86_64'
                     }
                 }
                 agent {
                     label "cpp && ${ARCHITECTURE}"
                 }
                 environment {
+                    PACKAGE_DIR = "${WORKSPACE}/.jenkins-build/packages"
                     DEPS_PREFIX_PATH        = "${WORKSPACE}/deps/spdlog;" +
                                               "${WORKSPACE}/deps/toml11;" +
                                               "${WORKSPACE}/deps/googletest;" +
@@ -279,6 +280,18 @@ pipeline {
                             always {
                                 junit 'test-results-debug.xml'
                             }
+                        }
+                    }
+
+                    stage('Package') {
+                        steps {
+                            sh "cpack --config '${WORKSPACE}/build/CPackConfig.cmake' -C Release -G TGZ -B '${PACKAGE_DIR}'"
+                            archiveArtifacts(
+                                artifacts: '.jenkins-build/packages/libroah.*.tar.gz',
+                                fingerprint: true,
+                                onlyIfSuccessful: true,
+                                allowEmptyArchive: false
+                            )
                         }
                     }
                 }
